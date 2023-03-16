@@ -91,8 +91,9 @@ hrc_ll = function(pars, u, v){
 #' @param lambda (numeric) Dependence parameter of the Hüsler-Reiss copula
 #' @param log (logical) If true returns log-Likelihood, default is False
 #'
-#' @return (numeric)
-#'
+#' @return (list(estimate (numeric), ci (numeric))) List of 2 elements,
+#' first element is the estimate of the Hüsler-Reiss dependence parameter,
+#' second element is the estimated 95% confidence interval from the Hessian.
 #' @export
 #'
 #' @examples
@@ -128,12 +129,7 @@ fit_hrc = function(u, v, initial_est){
     # estimate confidence interval from Hessian matric
     this_se = calc_se(this_fit$hessian)
     # return estimate and CI
-    list(Estimate = this_fit$par,
+    list(estimate = this_fit$par,
          ci = c(this_fit$par-this_se, this_fit$par+this_se))
   }
 }
-
-
-
-
-
