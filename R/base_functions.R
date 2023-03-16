@@ -62,7 +62,7 @@ rhr = function(n, lambda){
   # find root of this fn (finding inverse)
   # see https://stackoverflow.com/questions/10081479/solving-for-the-inverse-of-a-function-in-r
   solved_v = seq(n) %>%
-    map(~{
+    purrr::map(~{
       uniroot(conditional_density,
               interval = c(1e-20, 1-(1e-7)),
               y=runif(1),
