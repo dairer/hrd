@@ -25,7 +25,19 @@ devtools::install_github("dairer/hrd")
 ``` r
 library(hrd)
 library(ggplot2)
+library(tidyverse)
+```
 
+    ## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+    ## ✔ tibble  3.1.7     ✔ dplyr   1.0.9
+    ## ✔ tidyr   1.2.0     ✔ stringr 1.4.1
+    ## ✔ readr   2.1.2     ✔ forcats 0.5.1
+    ## ✔ purrr   1.0.1     
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
+
+``` r
 # sample data from a bivariate Hüsler-Reiss copula
 data = rhr(n=1000, lambda = 1.5)
 
@@ -46,10 +58,10 @@ fit_hrc(u = data[,1], v = data[,2], initial_est = 1)
 ```
 
     ## $estimate
-    ## [1] 1.520557
+    ## [1] 1.488652
     ## 
     ## $ci
-    ## [1] 1.426394 1.614720
+    ## [1] 1.393839 1.583465
 
 ### Esimating generalised pareto marings and dependence parameter of a Hüsler-Reiss copula jointly
 
@@ -98,6 +110,11 @@ scale and shape parameters of GPD margin 1. Equivalent for margin 2.
 dependence_mod = fit_hrc(data[,1], data[,2], initial_est = 1)
 
 marg1_mod = fit_gpd(x, initial_est = c(1,0))
+```
+
+    ## Warning in sqrt(.): NaNs produced
+
+``` r
 marg2_mod = fit_gpd(y, initial_est = c(1,0))
 
 data.frame(actual = c(2, -0.1, 1.3, -0.1, 1.5),
@@ -113,11 +130,23 @@ data.frame(actual = c(2, -0.1, 1.3, -0.1, 1.5),
   geom_point(aes(params, estimates_joint))+
   geom_segment(aes(x = params, xend = params, y = lower_joint, yend = upper_joint))+
   geom_point(aes(params, estimates_indep),position = position_nudge(x = 0.075), col = "magenta")+
-  geom_segment(aes(x = params, xend = params, y = lower_indep, yend = upper_indep),
-  position = position_nudge(x = 0.075), col = "magenta")+
+  geom_segment(aes(x = params, xend = params, y = lower_indep, yend = upper_indep),position = position_nudge(x = 0.075), col = "magenta")+
   labs(x = "Parameters",
        y = "Parameter estimates")+
   theme_minimal(12)
 ```
 
+    ## Warning: Removed 1 rows containing missing values (geom_segment).
+
 ![](README_files/figure-gfm/example4-1.png)<!-- -->
+
+![](README_files/figure-gfm/example5-1.png)<!-- -->
+
+The function `fit_hrc_bay` retuns the fitted model so you can do all the
+normal stan things, e.g. investigate trace plots:
+
+``` r
+rstan::traceplot(my_bayesian_fit$fitted_model)
+```
+
+![](README_files/figure-gfm/ex5-1.png)<!-- -->

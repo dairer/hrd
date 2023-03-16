@@ -16,8 +16,6 @@ phr = function(u,v, theta){
         log(v)*pnorm((1/theta) + (theta/2)*log(log(v)/log(u))))
 }
 
-
-
 #' Density function of the bi-variate Hüsler-Reiss copula
 #'
 #' @param u (numeric) Uniform margin of copula
@@ -250,8 +248,10 @@ fit_hrc_bay = function(u, v,
                        thin = 1){
 
   # load compiled stan model
-  hr_bivar_stan = readRDS("stan/compiled_bivar_hrc")
+  # hr_bivar_stan = readRDS("R/stan/compiled_bivar_hrc")
 
+
+  # hr_bivar_stan = stanmodels$bivar_hrc
   # prepare data for stan model
   stan_data = list(N=length(u),
                    u = u,
@@ -260,7 +260,7 @@ fit_hrc_bay = function(u, v,
                    prior_sd = prior_sd)
 
   # sample from stan model
-  fitted_model <- rstan::sampling(hr_bivar_stan,
+  fitted_model <- rstan::sampling(stanmodels$bivarhrc,
                                   data=stan_data,
                                   chains = chains,
                                   iter = iter,

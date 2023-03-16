@@ -26,6 +26,7 @@ devtools::install_github("dairer/hrd")
 ```{r example1}
 library(hrd)
 library(ggplot2)
+library(tidyverse)
 
 # sample data from a bivariate Hüsler-Reiss copula
 data = rhr(n=1000, lambda = 1.5)
