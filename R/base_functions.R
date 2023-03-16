@@ -70,5 +70,6 @@ rhr = function(n, lambda){
     }) %>%
     unlist
 
+
   cbind(u, v=solved_v)
 }
