@@ -58,10 +58,10 @@ fit_hrc(u = data[,1], v = data[,2], initial_est = 1)
 ```
 
     ## $estimate
-    ## [1] 1.474876
+    ## [1] 1.508459
     ## 
     ## $ci
-    ## [1] 1.380804 1.568948
+    ## [1] 1.413524 1.603394
 
 ### Esimating generalised pareto marings and dependence parameter of a Hüsler-Reiss copula jointly
 
@@ -133,12 +133,14 @@ data.frame(actual = c(2, -0.1, 1.3, -0.1, 1.5),
 
 ![](README_files/figure-gfm/example4-1.png)<!-- -->
 
+### We can fit a bi-variate copula using a bayesian framework.
+
 ``` r
 data = rhr(n=2000, lambda = 1.5)
 my_bayesian_fit = fit_hrc_bay(data[,1], 
                               data[,2],
                               chains = 2, 
-                              prior_mean = 1,
+                              prior_mean = 1, # mean of normal prior
                               prior_sd = 2,
                               cores = 2, # !! Make sure you have enough cores !!
                               iter = 2000,

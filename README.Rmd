@@ -105,12 +105,13 @@ data.frame(actual = c(2, -0.1, 1.3, -0.1, 1.5),
 ```
 
 
+### We can fit a bi-variate copula using a bayesian framework.
 ```{r example5}
 data = rhr(n=2000, lambda = 1.5)
 my_bayesian_fit = fit_hrc_bay(data[,1], 
                               data[,2],
                               chains = 2, 
-                              prior_mean = 1,
+                              prior_mean = 1, # mean of normal prior
                               prior_sd = 2,
                               cores = 2, # !! Make sure you have enough cores !!
                               iter = 2000,
@@ -127,7 +128,6 @@ data.frame(lambda_post = my_bayesian_fit$post,
   labs(x = "λ",
        y = "Density")
 ```
-
 
 The function `fit_hrc_bay` retuns the fitted model so you can do all the normal stan things, e.g. investigate trace plots:
 
