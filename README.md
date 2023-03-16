@@ -58,10 +58,10 @@ fit_hrc(u = data[,1], v = data[,2], initial_est = 1)
 ```
 
     ## $estimate
-    ## [1] 1.488652
+    ## [1] 1.474876
     ## 
     ## $ci
-    ## [1] 1.393839 1.583465
+    ## [1] 1.380804 1.568948
 
 ### Esimating generalised pareto marings and dependence parameter of a Hüsler-Reiss copula jointly
 
@@ -110,11 +110,6 @@ scale and shape parameters of GPD margin 1. Equivalent for margin 2.
 dependence_mod = fit_hrc(data[,1], data[,2], initial_est = 1)
 
 marg1_mod = fit_gpd(x, initial_est = c(1,0))
-```
-
-    ## Warning in sqrt(.): NaNs produced
-
-``` r
 marg2_mod = fit_gpd(y, initial_est = c(1,0))
 
 data.frame(actual = c(2, -0.1, 1.3, -0.1, 1.5),
@@ -136,9 +131,30 @@ data.frame(actual = c(2, -0.1, 1.3, -0.1, 1.5),
   theme_minimal(12)
 ```
 
-    ## Warning: Removed 1 rows containing missing values (geom_segment).
-
 ![](README_files/figure-gfm/example4-1.png)<!-- -->
+
+``` r
+data = rhr(n=2000, lambda = 1.5)
+my_bayesian_fit = fit_hrc_bay(data[,1], 
+                              data[,2],
+                              chains = 2, 
+                              prior_mean = 1,
+                              prior_sd = 2,
+                              cores = 2, # !! Make sure you have enough cores !!
+                              iter = 2000,
+                              thin = 2)
+
+
+data.frame(lambda_post = my_bayesian_fit$post,
+           lambda = my_bayesian_fit$estimate,
+           actual = 1.5) %>%
+  ggplot()+
+  geom_density(aes(lambda_post), alpha = 0.5, col = 'black', fill = 'lightblue')+
+  geom_vline(aes(xintercept = actual), col = 'black', size = 1.5)+
+  theme_minimal()+
+  labs(x = "λ",
+       y = "Density")
+```
 
 ![](README_files/figure-gfm/example5-1.png)<!-- -->
 
