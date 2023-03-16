@@ -28,7 +28,7 @@ library(hrd)
 library(ggplot2)
 
 # sample data from a bivariate Hüsler-Reiss copula
-data = rhr(n=500, lambda = 1.5)
+data = rhr(n=1000, lambda = 1.5)
 
 # visualise samples
 data %>%
@@ -54,6 +54,51 @@ data.frame(x,y) %>%
   geom_point(aes(x,y), shape = 4)+
   theme_minimal()
 
-fit_hrc_gp(x,y,initial_est = c(1,0,1,0,1))
+model_fit = fit_hrc_gp(x,y,initial_est = c(1,0,1,0,1))
+
+# visualise estimates
+data.frame(actual = c(2, -0.1, 1.3, -0.1, 1.5),
+       estimates = model_fit$estimate,
+       lower = model_fit$ci[,1],
+       upper = model_fit$ci[,2],
+       params = c('σ1', 'ξ1', 'σ2', 'ξ2', 'λ')) %>%
+  ggplot()+
+  geom_point(aes(params, estimates))+
+  geom_point(aes(params, actual),position = position_nudge(x = -0.075), shape = 4, col = 'red')+
+  geom_segment(aes(x = params, xend = params, y = lower, yend = upper))+
+  labs(x = "Parameters",
+       y = "Parameter estimates")+
+  theme_minimal(12)
 ```
 
+In each case the red 'x' is the true value. The black point along with the segment are the point estimates and 95% confidence intervals.
+λ is the dependence parameter of the Hüsler-Reiss copula.
+σ1 and ξ1 are the scale and shape parameters of GPD margin 1. Equivalent for margin 2.
+
+
+
+### We can compare estimates from margin-dependence indpendent analysis (in magenta) to joint modelling (in black).
+```{r example4}
+dependence_mod = fit_hrc(data[,1], data[,2], initial_est = 1)
+
+marg1_mod = fit_gpd(x, initial_est = c(1,0))
+marg2_mod = fit_gpd(y, initial_est = c(1,0))
+
+data.frame(actual = c(2, -0.1, 1.3, -0.1, 1.5),
+       estimates_joint = model_fit$estimate,
+       lower_joint = model_fit$ci[,1],
+       upper_joint = model_fit$ci[,2],
+       estimates_indep = c(marg1_mod$estimate, marg2_mod$estimate, dependence_mod$estimate),
+       lower_indep = c(marg1_mod$ci[,1],marg2_mod$ci[,1],dependence_mod$ci[1]),
+       upper_indep = c(marg1_mod$ci[,2],marg2_mod$ci[,2],dependence_mod$ci[2]),
+       params = c('σ1', 'ξ1', 'σ2', 'ξ2', 'λ')) %>%
+  ggplot()+
+  geom_point(aes(params, actual),position = position_nudge(x = -0.075), shape = 4, col = 'red')+
+  geom_point(aes(params, estimates_joint))+
+  geom_segment(aes(x = params, xend = params, y = lower_joint, yend = upper_joint))+
+  geom_point(aes(params, estimates_indep),position = position_nudge(x = 0.075), col = "magenta")+
+  geom_segment(aes(x = params, xend = params, y = lower_indep, yend = upper_indep),position = position_nudge(x = 0.075), col = "magenta")+
+  labs(x = "Parameters",
+       y = "Parameter estimates")+
+  theme_minimal(12)
+```
