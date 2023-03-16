@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of hrd is to …
+`hrd` is a collection of functions to help implement and develop and fit Hüsler-Reiss models.
 
 ## Installation
 
