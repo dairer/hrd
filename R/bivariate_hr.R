@@ -16,6 +16,8 @@ phr = function(u,v, theta){
         log(v)*pnorm((1/theta) + (theta/2)*log(log(v)/log(u))))
 }
 
+
+
 #' Density function of the bi-variate Hüsler-Reiss copula
 #'
 #' @param u (numeric) Uniform margin of copula
@@ -38,6 +40,7 @@ dhr = function(u, v, lambda, log = F){
   if(log) log(likelihood)
   else likelihood
 }
+
 
 #' Generate random samples from the bi-variate Hüsler-Reiss copula
 #'
@@ -215,4 +218,60 @@ fit_hrc_gp = function(x, y, initial_est){
     list(estimate = this_fit$par,
          ci = matrix(c(this_fit$par-this_se, this_fit$par+this_se), nrow = 5))
   }
+}
+
+#' Fitting a bi-variate Hüsler-Reiss copula in a bayesian framework
+#'
+#' @param u (numeric) Uniform margin of copula
+#' @param v (numeric) Uniform margin of copula
+#' @param prior_mean (numeric) Dependence parameter of the Hüsler-Reiss copula
+#' @param prior_sd (numeric) If true returns log-Likelihood, default is False
+#' @param chains (numeric) see ?rstan::sampling
+#' @param iter (numeric) see ?rstan::sampling
+#' @param cores (numeric) see ?rstan::sampling
+#' @param warmup (numeric) see ?rstan::sampling
+#' @param thin (numeric) see ?rstan::sampling
+#'
+#' @return (list(estimate (numeric), post (numeric), fitted_model (stan model))) List of 3 elements,
+#' first element is the estimate of the Hüsler-Reiss dependence parameter, calculated as the mean of the posterior distribution.
+#' Second element is the posterior distribution samples. Third element is the full fitted stan model.
+#' @export
+#'
+#' @examples
+#' dat = rhr(1000, 1.2)
+#' fit_hrc_bay(dat[,1], dat[,2], chains = 2)
+fit_hrc_bay = function(u, v,
+                       prior_mean = 0,
+                       prior_sd = 1,
+                       chains = 4,
+                       iter = 1000,
+                       warmup = floor(iter/2),
+                       cores=2,
+                       thin = 1){
+
+  # load compiled stan model
+  hr_bivar_stan = readRDS("stan/compiled_bivar_hrc")
+
+  # prepare data for stan model
+  stan_data = list(N=length(u),
+                   u = u,
+                   v = v,
+                   prior_mean = prior_mean,
+                   prior_sd = prior_sd)
+
+  # sample from stan model
+  fitted_model <- rstan::sampling(hr_bivar_stan,
+                                  data=stan_data,
+                                  chains = chains,
+                                  iter = iter,
+                                  cores = cores,
+                                  warmup = warmup,
+                                  thin = thin)
+
+  # extract posterior distribution
+  posterior_samples = rstan::extract(fitted_model)
+
+  list(estimate = mean(posterior_samples$lambda),
+       post = posterior_samples$lambda,
+       fitted_model = fitted_model)
 }
