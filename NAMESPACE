@@ -2,6 +2,7 @@
 
 export("%>%")
 export(dhr)
+export(fit_hrc)
 export(phr)
 export(rhr)
 importFrom(magrittr,"%>%")

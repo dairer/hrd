@@ -70,7 +70,70 @@ rhr = function(n, lambda){
     }) %>%
     unlist
 
-
-
   cbind(u, v=solved_v)
 }
+
+calc_se = function(hess){
+  se = hess %>% solve() %>% diag %>% sqrt()
+  1.96*se
+}
+
+hrc_ll = function(pars, u, v){
+  LL = -sum(dhr(u,v,lambda = pars, log = T))
+  if(is.infinite(LL)) return(100^100)
+  LL
+}
+
+#' Fitting a bi-variate Hüsler-Reiss copula
+#'
+#' @param u (numeric) Uniform margin of copula
+#' @param v (numeric) Uniform margin of copula
+#' @param lambda (numeric) Dependence parameter of the Hüsler-Reiss copula
+#' @param log (logical) If true returns log-Likelihood, default is False
+#'
+#' @return (numeric)
+#'
+#' @export
+#'
+#' @examples
+#' dat = rhr(1000, 1.2)
+#' fit_hrc(dat[,1], dat[,2],1)
+fit_hrc = function(u, v, initial_est){
+
+  # --- Error handling
+  # check variables are same length
+  if(length(u) != length(v)){
+    stop("Uniform variables must be the same length")
+  }
+
+  # check if values are in the range [0,1]
+  unif_range_check = range(u,v)
+  if(any(unif_range_check < 0) | any(unif_range_check>1)){
+    stop("Uniform variables must be in the range [0,1]")
+  }
+
+  this_fit = optim(fn=hrc_ll,
+                   par = initial_est,
+                   u = u,v = v,
+                   method = 'Brent',
+                   lower = 0.0000001,
+                   upper = 15,
+                   hessian = T)
+
+  if(det(this_fit$hessian)==0){
+    cat("Could not compute confidence interval as det(hessian) = 0. Try different initial_est.")
+    list(Estimate = this_fit$par)
+  }else{
+
+    # estimate confidence interval from Hessian matric
+    this_se = calc_se(this_fit$hessian)
+    # return estimate and CI
+    list(Estimate = this_fit$par,
+         ci = c(this_fit$par-this_se, this_fit$par+this_se))
+  }
+}
+
+
+
+
+
