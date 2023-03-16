@@ -6,8 +6,8 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-`hrd` is a collection of functions to help implement and develop and fit
-Hüsler-Reiss models.
+`hrd` is a collection of functions to help implement, develop and fit
+Hüsler-Reiss distribution based models.
 
 ## Installation
 
@@ -113,7 +113,8 @@ data.frame(actual = c(2, -0.1, 1.3, -0.1, 1.5),
   geom_point(aes(params, estimates_joint))+
   geom_segment(aes(x = params, xend = params, y = lower_joint, yend = upper_joint))+
   geom_point(aes(params, estimates_indep),position = position_nudge(x = 0.075), col = "magenta")+
-  geom_segment(aes(x = params, xend = params, y = lower_indep, yend = upper_indep),position = position_nudge(x = 0.075), col = "magenta")+
+  geom_segment(aes(x = params, xend = params, y = lower_indep, yend = upper_indep),
+  position = position_nudge(x = 0.075), col = "magenta")+
   labs(x = "Parameters",
        y = "Parameter estimates")+
   theme_minimal(12)
