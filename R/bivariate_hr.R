@@ -21,7 +21,7 @@ phr = function(u,v, theta){
 #' @param u (numeric) Uniform margin of copula
 #' @param v (numeric) Uniform margin of copula
 #' @param lambda (numeric) Dependence parameter of the Hüsler-Reiss copula
-#' @param log (logical) If true returns log
+#' @param log (logical) If true, returns log
 #'
 #' @return (numeric)
 #' @export
