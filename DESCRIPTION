@@ -13,5 +13,6 @@ URL: https://github.com/dairer/hrd
 BugReports: https://github.com/dairer/hrd/issues
 RoxygenNote: 7.2.0
 Imports: 
+    ggplot2,
     magrittr,
     purrr

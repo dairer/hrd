@@ -198,11 +198,6 @@ fit_hrc_gp = function(x, y, initial_est){
     stop("Variables must be the same length")
   }
 
-  # check if values are in the range [0,1]
-  unif_range_check = range(u,v)
-  if(any(unif_range_check < 0) | any(unif_range_check>1)){
-    stop("Variables must be in the range [0,1]")
-  }
 
   this_fit = optim(fn=hrc_gp_nll,
                    par = initial_est,
