@@ -18,13 +18,9 @@ install.packages('devtools')
 devtools::install_github("dairer/hrd")
 ```
 
-## Example
-
-### Sampling bivariate Hüsler-Reiss copula
-
 ``` r
 library(hrd)
-library(ggplot2)
+library(ggplot2) 
 library(tidyverse)
 ```
 
@@ -36,6 +32,10 @@ library(tidyverse)
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
+
+## Example
+
+### Sampling bivariate Hüsler-Reiss copula
 
 ``` r
 # sample data from a bivariate Hüsler-Reiss copula
@@ -58,10 +58,10 @@ fit_hrc(u = data[,1], v = data[,2], initial_est = 1)
 ```
 
     ## $estimate
-    ## [1] 1.508459
+    ## [1] 1.48647
     ## 
     ## $ci
-    ## [1] 1.413524 1.603394
+    ## [1] 1.394242 1.578698
 
 ### Esimating generalised pareto marings and dependence parameter of a Hüsler-Reiss copula jointly
 
@@ -136,14 +136,14 @@ data.frame(actual = c(2, -0.1, 1.3, -0.1, 1.5),
 ### We can fit a bi-variate copula using a bayesian framework.
 
 ``` r
-data = rhr(n=2000, lambda = 1.5)
+data = rhr(n=1000, lambda = 1.5)
 my_bayesian_fit = fit_hrc_bay(data[,1], 
                               data[,2],
                               chains = 2, 
                               prior_mean = 1, # mean of normal prior
                               prior_sd = 2,
                               cores = 2, # !! Make sure you have enough cores !!
-                              iter = 2000,
+                              iter = 1000,
                               thin = 2)
 
 

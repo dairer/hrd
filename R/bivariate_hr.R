@@ -187,8 +187,8 @@ hrc_gp_nll = function(pars, x, y){
 #' copula_sample = rhr(1000, 2)
 #'
 #' # Transform margins to be GPD
-#' margin_1 = qgp(copula_sampe[,1], scale = 2, shape = -0.1)
-#' margin_2 = qgp(copula_sampe[,2], scale = 1.3, shape = -0.1)
+#' margin_1 = qgp(copula_sample[,1], scale = 2, shape = -0.1)
+#' margin_2 = qgp(copula_sample[,2], scale = 1.3, shape = -0.1)
 #'
 #' # fit margins and copula jointly
 #' fit_hrc_gp(margin_1, margin_2, initial_est = c(1,0.1,1,-0.12,1))

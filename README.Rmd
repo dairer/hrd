@@ -20,14 +20,15 @@ install.packages('devtools')
 devtools::install_github("dairer/hrd")
 ```
 
-## Example
+```{r results='hide'}
+library(hrd)
+library(ggplot2) 
+library(tidyverse)
+```
 
+## Example
 ### Sampling bivariate Hüsler-Reiss copula 
 ```{r example1}
-library(hrd)
-library(ggplot2)
-library(tidyverse)
-
 # sample data from a bivariate Hüsler-Reiss copula
 data = rhr(n=1000, lambda = 1.5)
 
@@ -107,14 +108,14 @@ data.frame(actual = c(2, -0.1, 1.3, -0.1, 1.5),
 
 ### We can fit a bi-variate copula using a bayesian framework.
 ```{r example5}
-data = rhr(n=2000, lambda = 1.5)
+data = rhr(n=1000, lambda = 1.5)
 my_bayesian_fit = fit_hrc_bay(data[,1], 
                               data[,2],
                               chains = 2, 
                               prior_mean = 1, # mean of normal prior
                               prior_sd = 2,
                               cores = 2, # !! Make sure you have enough cores !!
-                              iter = 2000,
+                              iter = 1000,
                               thin = 2)
 
 
