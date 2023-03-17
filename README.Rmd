@@ -1,18 +1,23 @@
 ---
 output: github_document
 ---
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 # hrd
-
 <!-- badges: start -->
 <!-- badges: end -->
 
-`hrd` is a collection of functions to help implement, develop and fit Hüsler-Reiss distribution based models.
+`hrd` is a collection of functions to help implement, develop and fit
+Hüsler-Reiss distribution based models.
+
+## Table of contents
+**Introduction**
+> - [Getting set up](#installation)
+
+**Wokring with bivariate Hüsler-Reiss copula**
+> - [Sampling data](#example)
+> - [Fitting (MLE)](#esimating-the-dependence-parameter-of-a-hüsler-reiss-copula)
+> - [Fitting (Bayesian)](#we-can-fit-a-bi-variate-copula-using-a-bayesian-framework)
 
 ## Installation
-
 You can install the development version of hrd like so:
 
 ``` r

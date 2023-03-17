@@ -1,6 +1,4 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 # hrd
 
 <!-- badges: start -->
@@ -8,6 +6,16 @@
 
 `hrd` is a collection of functions to help implement, develop and fit
 Hüsler-Reiss distribution based models.
+
+## Table of contents
+
+**Introduction** \> - [Getting set up](#installation)
+
+**Wokring with bivariate Hüsler-Reiss copula** \> - [Sampling
+data](#example) \> - [Fitting
+(MLE)](#esimating-the-dependence-parameter-of-a-hüsler-reiss-copula)
+\> - [Fitting
+(Bayesian)](#we-can-fit-a-bi-variate-copula-using-a-bayesian-framework)
 
 ## Installation
 
@@ -58,10 +66,10 @@ fit_hrc(u = data[,1], v = data[,2], initial_est = 1)
 ```
 
     ## $estimate
-    ## [1] 1.48647
+    ## [1] 1.507511
     ## 
     ## $ci
-    ## [1] 1.394242 1.578698
+    ## [1] 1.413844 1.601178
 
 ### Esimating generalised pareto marings and dependence parameter of a Hüsler-Reiss copula jointly
 
