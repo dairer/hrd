@@ -10,10 +10,6 @@ phr(u, v, theta)
 \item{u}{(numeric) Uniform margin of copula}
 
 \item{v}{(numeric) Uniform margin of copula}
-
-\item{lambda}{(numeric) Dependence parameter of the Hüsler-Reiss copula}
-
-\item{log}{(logical) If true returns log-Likelihood, default is False}
 }
 \value{
 (numeric)

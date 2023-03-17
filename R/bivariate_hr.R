@@ -1,9 +1,8 @@
 #' Cumulative distribution function of the bi-variate Hüsler-Reiss copula
 #'
 #' @param u (numeric) Uniform margin of copula
+#' @param theta
 #' @param v (numeric) Uniform margin of copula
-#' @param lambda (numeric) Dependence parameter of the Hüsler-Reiss copula
-#' @param log (logical) If true returns log-Likelihood, default is False
 #'
 #' @return (numeric)
 #'
@@ -12,6 +11,7 @@
 #' @examples
 #' dhr(u = c(0.1, 0.2, 0.4), v = c(0.6, 0.7, 0.2), lambda = 1)
 phr = function(u,v, theta){
+
   exp(log(u) * pnorm((1/theta) + (theta/2)*log(log(u)/log(v))) +
         log(v)*pnorm((1/theta) + (theta/2)*log(log(v)/log(u))))
 }
