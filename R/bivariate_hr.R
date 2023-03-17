@@ -249,8 +249,6 @@ fit_hrc_bay = function(u, v,
 
   # load compiled stan model
   # hr_bivar_stan = readRDS("R/stan/compiled_bivar_hrc")
-
-
   # hr_bivar_stan = stanmodels$bivar_hrc
   # prepare data for stan model
   stan_data = list(N=length(u),
@@ -275,3 +273,68 @@ fit_hrc_bay = function(u, v,
        post = posterior_samples$lambda,
        fitted_model = fitted_model)
 }
+
+
+
+
+
+
+
+
+
+#' Fitting a GPD in a bayesian framework
+#'
+#' @param x (numeric) data
+#' @param v (numeric) Uniform margin of copula
+#'
+#' @param scale_prior_param (numeric) rate of exp prior for scale parameter
+#' @param shape_prior_lower (numeric) lower bound for uniform prior for shape parameter
+#' @param shape_prior_upper (numeric) upper bound for uniform prior for shape parameter
+#' @param chains (numeric) see ?rstan::sampling
+#' @param iter (numeric) see ?rstan::sampling
+#' @param cores (numeric) see ?rstan::sampling
+#' @param warmup (numeric) see ?rstan::sampling
+#' @param thin (numeric) see ?rstan::sampling
+#'
+#' @return (list(estimate (numeric), post (numeric), fitted_model (stan model))) List of 3 elements,
+#' first element is the estimate of the GPD parameters, calculated as the mean of the posterior distribution.
+#' Second element is the posterior distribution samples. Third element is the full fitted stan model.
+#' @export
+#'
+#' @examples
+#' x = rgp(1000, scale = 2, shape = -0.1)
+#' fit_gpd_bay(x)
+fit_gpd_bay = function(x,
+                       scale_prior_param = 1,
+                       shape_prior_lower = -0.5,
+                       shape_prior_upper = 0.5,
+                       chains = 2,
+                       iter = 2000,
+                       warmup = floor(iter/2),
+                       cores=2,
+                       thin = 1){
+
+  stan_data = list(y = x,
+                   N = length(x),
+                   scale_prior_param = scale_prior_param,
+                   shape_prior_upper = shape_prior_upper,
+                   shape_prior_lower = shape_prior_lower)
+
+  # sample from stan model
+  fitted_model <- rstan::sampling(stanmodels$gpd,
+                                  data=stan_data,
+                                  chains = chains,
+                                  iter = iter,
+                                  cores = cores,
+                                  warmup = warmup,
+                                  thin = thin)
+
+  # extract posterior distribution
+  posterior_samples = rstan::extract(fitted_model)
+
+  list(estimate = c(mean(posterior_samples$scale), mean(posterior_samples$shape)),
+       post = list(scale = posterior_samples$scale,
+                   shape = posterior_samples$shape),
+       fitted_model = fitted_model)
+}
+
