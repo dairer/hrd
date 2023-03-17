@@ -7,15 +7,19 @@
 `hrd` is a collection of functions to help implement, develop and fit
 Hüsler-Reiss distribution based models.
 
-## Table of contents
+## Table of content
 
-**Introduction** \> - [Getting set up](#installation)
+**Introduction**
 
-**Wokring with bivariate Hüsler-Reiss copula** \> - [Sampling
-data](#example) \> - [Fitting
-(MLE)](#esimating-the-dependence-parameter-of-a-hüsler-reiss-copula)
-\> - [Fitting
-(Bayesian)](#we-can-fit-a-bi-variate-copula-using-a-bayesian-framework)
+> -   [Getting set up](#installation)
+
+**Wokring with bivariate Hüsler-Reiss copula**
+
+> -   [Sampling data](#example)
+> -   [Fitting
+>     (MLE)](#esimating-the-dependence-parameter-of-a-hüsler-reiss-copula)
+> -   [Fitting
+>     (Bayesian)](#we-can-fit-a-bi-variate-copula-using-a-bayesian-framework)
 
 ## Installation
 
@@ -66,10 +70,10 @@ fit_hrc(u = data[,1], v = data[,2], initial_est = 1)
 ```
 
     ## $estimate
-    ## [1] 1.507511
+    ## [1] 1.48058
     ## 
     ## $ci
-    ## [1] 1.413844 1.601178
+    ## [1] 1.38693 1.57423
 
 ### Esimating generalised pareto marings and dependence parameter of a Hüsler-Reiss copula jointly
 
@@ -118,6 +122,11 @@ scale and shape parameters of GPD margin 1. Equivalent for margin 2.
 dependence_mod = fit_hrc(data[,1], data[,2], initial_est = 1)
 
 marg1_mod = fit_gpd(x, initial_est = c(1,0))
+```
+
+    ## Warning in sqrt(.): NaNs produced
+
+``` r
 marg2_mod = fit_gpd(y, initial_est = c(1,0))
 
 data.frame(actual = c(2, -0.1, 1.3, -0.1, 1.5),
@@ -138,6 +147,8 @@ data.frame(actual = c(2, -0.1, 1.3, -0.1, 1.5),
        y = "Parameter estimates")+
   theme_minimal(12)
 ```
+
+    ## Warning: Removed 1 rows containing missing values (geom_segment).
 
 ![](README_files/figure-gfm/example4-1.png)<!-- -->
 
