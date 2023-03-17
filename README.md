@@ -70,10 +70,10 @@ fit_hrc(u = data[,1], v = data[,2], initial_est = 1)
 ```
 
     ## $estimate
-    ## [1] 1.409737
+    ## [1] 1.451438
     ## 
     ## $ci
-    ## [1] 1.318568 1.500907
+    ## [1] 1.359619 1.543256
 
 ### Esimating generalised pareto marings and dependence parameter of a Hüsler-Reiss copula jointly
 
