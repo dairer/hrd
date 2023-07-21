@@ -369,3 +369,87 @@ fit_gpd_bay = function(x,
 # list(estimate = mean(posterior_samples$lambda),
 #      post = posterior_samples$lambda,
 #      fitted_model = fitted_model)
+
+
+
+# negative log likelihood of copula and margins
+hrc_gev_nll = function(pars, x, y){
+
+
+  if(pars[2] <= 0) return(100^100)
+  if((pars[3] < 0) & any(x > (pars[1] - (pars[2]/pars[3])))) return(100^100)
+  if((pars[3] > 0) & any(x < (pars[1] - (pars[2]/pars[3])))) return(100^100)
+
+
+  if(pars[5] <= 0) return(100^100)
+  if((pars[6] < 0) & any(x > (pars[4] - (pars[5]/pars[6])))) return(100^100)
+  if((pars[6] > 0) & any(x < (pars[4] - (pars[5]/pars[6])))) return(100^100)
+
+
+  if(pars[7]<=0 | pars[7]>15) return(100^100)
+
+  # likelihood of margin 1
+  llm1 = dgev(x, loc = pars[1], scale = pars[2], shape = pars[3])
+
+  # likelihood of margin 2
+  llm2 = dgev(y, loc = pars[4], scale = pars[5], shape = pars[6])
+
+  # likelihood of copula
+  unif_1 = pgev(x, loc = pars[1], scale = pars[2], shape = pars[3])
+  unif_2 = pgev(y, loc = pars[4], scale = pars[5], shape = pars[6])
+  llc = dhr(unif_1, unif_2, lambda = pars[7])
+
+  # full = likelihood
+  LL =  -sum(log(llm1*llm2*llc))
+
+  if(is.infinite(LL)) return(100^100)
+  if(is.na(LL)) return(100^100)
+  LL
+}
+
+#' Jointly fitting a bi-variate Hüsler-Reiss copula and generlaised Pareto margins
+#'
+#' @param x (numeric) margin 1, assumed to be generalised Pareto distributed
+#' @param y (numeric) margin 2, assumed to be generalised Pareto distributed
+#' @param initial_est (numeric) Vector of initial parameter estimates
+#'
+#' @return (list(estimate (numeric), ci (matrix))) List of 2 elements,
+#' first element is the estimates of the generalised Pareto distribution parameters and Hüsler Reiss copula parameter,
+#' second element is the estimated 95% confidence interval from the Hessian, the i-th row corresponds to the i-th estimate.
+#' @export
+#'
+#' @examples
+#' # sample from a Hüsler-Reiss copula
+#' copula_sample = rhr(1000, 2)
+#'
+#' # Transform margins to be GPD
+#' margin_1 = qgp(copula_sample[,1], scale = 2, shape = -0.1)
+#' margin_2 = qgp(copula_sample[,2], scale = 1.3, shape = -0.1)
+#'
+#' # fit margins and copula jointly
+#' fit_hrc_gp(margin_1, margin_2, initial_est = c(1,0.1,1,-0.12,1))
+fit_hrc_gev = function(x, y, initial_est){
+  # --- Error handling
+  # check variables are same length
+  if(length(x) != length(y)){
+    stop("Variables must be the same length")
+  }
+
+
+  this_fit = optim(fn=hrc_gev_nll,
+                   par = initial_est,
+                   x = x, y = y,
+                   hessian = T)
+
+  if(det(this_fit$hessian)==0){
+    cat("Could not compute confidence interval as det(hessian) = 0. Try different initial_est.")
+    list(Estimate = this_fit$par)
+  }else{
+
+    # estimate confidence interval from Hessian matric
+    this_se = calc_se(this_fit$hessian)
+    # return estimate and CI
+    list(estimate = this_fit$par,
+         ci = matrix(c(this_fit$par-this_se, this_fit$par+this_se), nrow = 5))
+  }
+}
