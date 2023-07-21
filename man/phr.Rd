@@ -10,6 +10,8 @@ phr(u, v, theta)
 \item{u}{(numeric) Uniform margin of copula}
 
 \item{v}{(numeric) Uniform margin of copula}
+
+\item{theta}{(numeric) dependence parameter of Hüsler-Reiss distribution}
 }
 \value{
 (numeric)

@@ -1,8 +1,8 @@
 #' Cumulative distribution function of the bi-variate Hüsler-Reiss copula
 #'
 #' @param u (numeric) Uniform margin of copula
-#' @param theta
 #' @param v (numeric) Uniform margin of copula
+#' @param theta (numeric) dependence parameter of Hüsler-Reiss distribution
 #'
 #' @return (numeric)
 #'
@@ -46,7 +46,7 @@ dhr = function(u, v, lambda, log = F){
 #' @param lambda (numeric) Dependence parameter of the Hüsler-Reiss copula
 #'
 #' @return (Matrix) Random samples from bi-variate Hüsler-Reiss copula
-#' @export
+#'@export
 #'
 #' @examples
 #' rhr(n = 10, lambda = 1)
@@ -275,13 +275,6 @@ fit_hrc_bay = function(u, v,
 }
 
 
-
-
-
-
-
-
-
 #' Fitting a GPD in a bayesian framework
 #'
 #' @param x (numeric) data
@@ -338,3 +331,41 @@ fit_gpd_bay = function(x,
        fitted_model = fitted_model)
 }
 
+
+
+
+#
+# copula_sample = hrd::rhr(5000, 2)
+#
+# # Transform margins to be GPD
+# margin_1 = hrd::qgp(copula_sample[,1], scale = 1.2, shape = -0.2)
+# margin_2 = hrd::qgp(copula_sample[,2], scale = 0.8, shape = -0.11)
+#
+# # fit margins and copula jointly
+# stan_data = list(x = margin_1,
+#                  y = margin_2,
+#                  prior_mean = 1,
+#                  prior_sd = 1,
+#                  N = length(margin_1),
+#                  prior_mean_xi_1 = 0,
+#                  prior_sd_xi_1 = 1,
+#                  prior_mean_sig_1 = 1,
+#                  prior_sd_sig_1 = 1,
+#                  prior_mean_xi_2 = 0,
+#                  prior_sd_xi_2 = 1,
+#                  prior_mean_sig_2 = 2,
+#                  prior_sd_sig_2 = 1)
+#
+# fitted_model = rstan::stan(
+#   file = "inst/stan/bivarhrcgpd.stan",
+#   data = stan_data,
+#   iter = 3000,
+#   cores = 8,
+#   chains = 8)
+#
+# # extract posterior distribution
+# posterior_samples = rstan::extract(fitted_model)
+#
+# list(estimate = mean(posterior_samples$lambda),
+#      post = posterior_samples$lambda,
+#      fitted_model = fitted_model)

@@ -10,7 +10,7 @@ fit_gpd_bay(
   shape_prior_lower = -0.5,
   shape_prior_upper = 0.5,
   chains = 2,
-  iter = 500,
+  iter = 2000,
   warmup = floor(iter/2),
   cores = 2,
   thin = 1
