@@ -22,5 +22,5 @@ rgev(n, loc, scale, shape)
 Generate random samples from the generalised extreme value distribution
 }
 \examples{
-rgev(n = 100, scale = 1, shape = 0)
+rgev(n = 100, loc = 1, scale = 1, shape = 0)
 }

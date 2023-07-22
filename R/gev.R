@@ -84,7 +84,7 @@ pgev = function(x, loc, scale, shape){
 #' @export
 #'
 #' @examples
-#' pgev(x = 0.5, loc, scale = 1, shape = 0)
+#' qgev(x = 0.5, loc = 1, scale = 1, shape = 0)
 qgev = function(x, loc, scale, shape){
   # --- error control
   if(scale <= 0)
@@ -114,7 +114,7 @@ qgev = function(x, loc, scale, shape){
 #' @export
 #'
 #' @examples
-#' rgev(n = 100, scale = 1, shape = 0)
+#' rgev(n = 100, loc = 1, scale = 1, shape = 0)
 rgev = function(n, loc, scale, shape) runif(n) %>% qgev(loc, scale, shape)
 
 # negative log likelihood function of the generalised extreme value distribution

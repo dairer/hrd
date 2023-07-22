@@ -22,5 +22,5 @@ qgev(x, loc, scale, shape)
 Quantile function of the generalised extreme value distribution (inverse cumulative distribution function)
 }
 \examples{
-pgev(x = 0.5, loc, scale = 1, shape = 0)
+qgev(x = 0.5, loc = 1, scale = 1, shape = 0)
 }

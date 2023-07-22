@@ -7,9 +7,9 @@
 fit_hrc_gev(x, y, initial_est)
 }
 \arguments{
-\item{x}{(numeric) margin 1, assumed to be generalised Pareto distributed}
+\item{x}{(numeric) margin 1, assumed to be GEV distributed}
 
-\item{y}{(numeric) margin 2, assumed to be generalised Pareto distributed}
+\item{y}{(numeric) margin 2, assumed to be GEV distributed}
 
 \item{initial_est}{(numeric) Vector of initial parameter estimates}
 }
@@ -25,10 +25,10 @@ Jointly fitting a bi-variate Hüsler-Reiss copula and generlaised Pareto margins
 # sample from a Hüsler-Reiss copula
 copula_sample = rhr(1000, 2)
 
-# Transform margins to be GPD
-margin_1 = qgp(copula_sample[,1], scale = 2, shape = -0.1)
-margin_2 = qgp(copula_sample[,2], scale = 1.3, shape = -0.1)
+# Transform margins to be GEV
+margin_1 = qgev(copula_sample[,1], loc = 1, scale = 2, shape = -0.1)
+margin_2 = qgev(copula_sample[,2], loc = 1.5, scale = 1.3, shape = -0.1)
 
 # fit margins and copula jointly
-fit_hrc_gp(margin_1, margin_2, initial_est = c(1,0.1,1,-0.12,1))
+fit_hrc_gp(margin_1, margin_2, initial_est = c(1,1,0,1,1,0,1))
 }
