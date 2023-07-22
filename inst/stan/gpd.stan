@@ -30,6 +30,7 @@ parameters {
   real <lower=-scale/(maxObs)> shape;
 }
 
+
 model {
   // priors
   shape ~ uniform(shape_prior_lower, shape_prior_upper);

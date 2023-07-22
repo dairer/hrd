@@ -214,7 +214,7 @@ fit_hrc_gp = function(x, y, initial_est){
     this_se = calc_se(this_fit$hessian)
     # return estimate and CI
     list(estimate = this_fit$par,
-         ci = matrix(c(this_fit$par-this_se, this_fit$par+this_se), nrow = 5))
+         ci = matrix(c(this_fit$par-this_se, this_fit$par+this_se), nrow = 7))
   }
 }
 
@@ -279,7 +279,6 @@ fit_hrc_bay = function(u, v,
 #'
 #' @param x (numeric) data
 #' @param v (numeric) Uniform margin of copula
-#'
 #' @param scale_prior_param (numeric) rate of exp prior for scale parameter
 #' @param shape_prior_lower (numeric) lower bound for uniform prior for shape parameter
 #' @param shape_prior_upper (numeric) upper bound for uniform prior for shape parameter
@@ -334,47 +333,10 @@ fit_gpd_bay = function(x,
 
 
 
-#
-# copula_sample = hrd::rhr(5000, 2)
-#
-# # Transform margins to be GPD
-# margin_1 = hrd::qgp(copula_sample[,1], scale = 1.2, shape = -0.2)
-# margin_2 = hrd::qgp(copula_sample[,2], scale = 0.8, shape = -0.11)
-#
-# # fit margins and copula jointly
-# stan_data = list(x = margin_1,
-#                  y = margin_2,
-#                  prior_mean = 1,
-#                  prior_sd = 1,
-#                  N = length(margin_1),
-#                  prior_mean_xi_1 = 0,
-#                  prior_sd_xi_1 = 1,
-#                  prior_mean_sig_1 = 1,
-#                  prior_sd_sig_1 = 1,
-#                  prior_mean_xi_2 = 0,
-#                  prior_sd_xi_2 = 1,
-#                  prior_mean_sig_2 = 2,
-#                  prior_sd_sig_2 = 1)
-#
-# fitted_model = rstan::stan(
-#   file = "inst/stan/bivarhrcgpd.stan",
-#   data = stan_data,
-#   iter = 3000,
-#   cores = 8,
-#   chains = 8)
-#
-# # extract posterior distribution
-# posterior_samples = rstan::extract(fitted_model)
-#
-# list(estimate = mean(posterior_samples$lambda),
-#      post = posterior_samples$lambda,
-#      fitted_model = fitted_model)
-
 
 
 # negative log likelihood of copula and margins
 hrc_gev_nll = function(pars, x, y){
-
 
   if(pars[2] <= 0) return(100^100)
   if((pars[3] < 0) & any(x > (pars[1] - (pars[2]/pars[3])))) return(100^100)
@@ -452,3 +414,136 @@ fit_hrc_gev = function(x, y, initial_est){
          ci = matrix(c(this_fit$par-this_se, this_fit$par+this_se), nrow = 5))
   }
 }
+
+
+# copula_sample = hrd::rhr(5000, 2)
+# #
+# # Transform margins to be GPD
+# margin_1 = hrd::qgp(copula_sample[,1], scale = 1, shape = -0.2)
+# margin_2 = hrd::qgp(copula_sample[,2], scale = 1, shape = -0.2)
+# #
+# # # fit margins and copula jointly
+# stan_data = list(x = margin_1,
+#                  y = margin_2,
+#                  prior_mean = 1,
+#                  prior_sd = 1,
+#                  N = length(margin_1),
+#                  prior_mean_xi_1 = 0,
+#                  prior_sd_xi_1 = 1,
+#                  prior_mean_sig_1 = 1,
+#                  prior_sd_sig_1 = 1,
+#                  prior_mean_xi_2 = 0,
+#                  prior_sd_xi_2 = 1,
+#                  prior_mean_sig_2 = 1,
+#                  prior_sd_sig_2 = 1)
+# #
+# fitted_model = rstan::stan(
+#   file = "inst/stan/bivarhrcgpd.stan",
+#   data = stan_data,
+#   iter = 1000,
+#   cores = 2,
+#   chains = 2)
+# #
+# # # extract posterior distribution
+# # posterior_samples = rstan::extract(fitted_model)
+# #
+# # list(estimate = mean(posterior_samples$lambda),
+# #      post = posterior_samples$lambda,
+# #      fitted_model = fitted_model)
+
+
+
+#' Fitting a bi-variate Hüsler-Reiss copula in a bayesian framework
+#'
+#' @param x (numeric) margin 1, assumed to be generalised Pareto distributed
+#' @param y (numeric) margin 2, assumed to be generalised Pareto distributed
+#' @param prior_mean (numeric) Mean of normal prior of dependence parameter of the Hüsler-Reiss copula
+#' @param prior_sd (numeric) Standard deviation of normal prior of dependence parameter of the Hüsler-Reiss copula
+#' @param prior_mean_sig_1 (numeric) Mean of normal prior on scale parameter of GPD of margin 1
+#' @param prior_sd_sig_1 (numeric)  Standard deviation of normal prior on scale parameter of GPD of margin 1
+#' @param prior_mean_sig_2 (numeric)  Mean of normal prior on scale parameter of GPD of margin 2
+#' @param prior_sd_sig_2 (numeric)  Standard deviation of normal prior on scale parameter of GPD of margin 2
+#' @param prior_mean_xi_1 (numeric)  Mean of normal prior on shape parameter of GPD of margin 1
+#' @param prior_sd_xi_1 (numeric)  Standard deviation of normal prior on shape parameter of GPD of margin 1
+#' @param prior_mean_xi_2 (numeric)  Mean of normal prior on shape parameter of GPD of margin 2
+#' @param prior_sd_xi_2 (numeric)  Standard deviation of normal prior on shape parameter of GPD of margin 2
+#'
+#' @param chains (numeric) see ?rstan::sampling
+#' @param iter (numeric) see ?rstan::sampling
+#' @param cores (numeric) see ?rstan::sampling
+#' @param warmup (numeric) see ?rstan::sampling
+#' @param thin (numeric) see ?rstan::sampling
+#'
+#' @return (list(estimate (numeric), post (list), fitted_model (stan model))) List of 3 elements,
+#' first element is the estimate of the GPD margin parameters as well as the Hüsler-Reiss dependence parameter, calculated as the mean of the posterior distribution.
+#' Second element are the posterior distribution samples. Third element is the full fitted stan model.
+#' @export
+#'
+#' @examples
+#' # sample from a Hüsler-Reiss copula
+#' copula_sample = rhr(1000, 2)
+#'
+#' # Transform margins to be GPD
+#' margin_1 = qgp(copula_sample[,1], scale = 1.2, shape = -0.11)
+#' margin_2 = qgp(copula_sample[,2], scale = 1.3, shape = -0.09)
+#'
+#' # fit margins and copula jointly
+#' fit_hrc_gp_bay(margin_1, margin_2)
+fit_hrc_gp_bay = function(x, y,
+                          prior_mean = 1,
+                          prior_sd = 1,
+                          prior_mean_xi_1 = 0,
+                          prior_sd_xi_1 = 1,
+                          prior_mean_sig_1 = 1,
+                          prior_sd_sig_1 = 1,
+                          prior_mean_xi_2 = 0,
+                          prior_sd_xi_2 = 1,
+                          prior_mean_sig_2 = 1,
+                          prior_sd_sig_2 = 1,
+                          chains = 4,
+                          iter = 1000,
+                          warmup = floor(iter/2),
+                          cores=2,
+                          thin = 1){
+
+  # load compiled stan model
+  # prepare data for stan model
+  stan_data = list(x = x,
+                   y = y,
+                   prior_mean = prior_mean,
+                   prior_sd = prior_sd,
+                   N = length(x),
+                   prior_mean_xi_1 = prior_mean_xi_1,
+                   prior_sd_xi_1 = prior_sd_xi_1,
+                   prior_mean_sig_1 = prior_mean_sig_1,
+                   prior_sd_sig_1 = prior_sd_sig_1,
+                   prior_mean_xi_2 = prior_mean_xi_2,
+                   prior_sd_xi_2 = prior_sd_xi_2,
+                   prior_mean_sig_2 = prior_mean_sig_2,
+                   prior_sd_sig_2 = prior_sd_sig_2)
+
+  # sample from stan model
+  fitted_model <- rstan::sampling(stanmodels$bivarhrcgpd,
+                                  data=stan_data,
+                                  chains = chains,
+                                  iter = iter,
+                                  cores = cores,
+                                  warmup = warmup,
+                                  thin = thin)
+
+  # extract posterior distribution
+  posterior_samples = rstan::extract(fitted_model)
+
+  list(estimate = c(mean(posterior_samples$scale_1),
+                    mean(posterior_samples$shape_1),
+                    mean(posterior_samples$scale_2),
+                    mean(posterior_samples$shape_2),
+                    mean(posterior_samples$lambda)),
+       post = list(scale_1 = posterior_samples$scale_1,
+                   shape_1 = posterior_samples$shape_1,
+                   scale_2 = posterior_samples$scale_2,
+                   shape_2 = posterior_samples$shape_2,
+                   lambda = posterior_samples$lambda),
+       fitted_model = fitted_model)
+}
+
