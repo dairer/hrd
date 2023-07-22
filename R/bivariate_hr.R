@@ -453,7 +453,7 @@ fit_hrc_gev = function(x, y, initial_est){
 
 
 
-#' Fitting a bi-variate Hüsler-Reiss copula in a bayesian framework
+#' Fitting a bi-variate Hüsler-Reiss copula in a bayesian framework jointly with GPD margins estimates
 #'
 #' @param x (numeric) margin 1, assumed to be generalised Pareto distributed
 #' @param y (numeric) margin 2, assumed to be generalised Pareto distributed
@@ -500,7 +500,7 @@ fit_hrc_gp_bay = function(x, y,
                           prior_sd_xi_2 = 1,
                           prior_mean_sig_2 = 1,
                           prior_sd_sig_2 = 1,
-                          chains = 4,
+                          chains = 2,
                           iter = 1000,
                           warmup = floor(iter/2),
                           cores=2,
@@ -546,4 +546,119 @@ fit_hrc_gp_bay = function(x, y,
                    lambda = posterior_samples$lambda),
        fitted_model = fitted_model)
 }
+
+
+
+
+#' Fitting a bi-variate Hüsler-Reiss copula in a bayesian framework jointly with GEV margins estimates
+#'
+#' @param x (numeric) margin 1, assumed to be generalised extreme value distributed
+#' @param y (numeric) margin 2, assumed to be generalised extreme value distributed
+#' @param prior_mean (numeric) Mean of normal prior of dependence parameter of the Hüsler-Reiss copula
+#' @param prior_sd (numeric) Standard deviation of normal prior of dependence parameter of the Hüsler-Reiss copula
+#' @param prior_mean_loc_1 (numeric) Mean of normal prior on location parameter of GPD of margin 1
+#' @param prior_sd_loc_1 (numeric)  Standard deviation of normal prior on location parameter of GPD of margin 1
+#' @param prior_mean_loc_2 (numeric)  Mean of normal prior on location parameter of GPD of margin 2
+#' @param prior_sd_loc_2 (numeric)  Standard deviation of normal prior on location parameter of GPD of margin 2
+#' @param prior_mean_sig_1 (numeric) Mean of normal prior on scale parameter of GPD of margin 1
+#' @param prior_sd_sig_1 (numeric)  Standard deviation of normal prior on scale parameter of GPD of margin 1
+#' @param prior_mean_sig_2 (numeric)  Mean of normal prior on scale parameter of GPD of margin 2
+#' @param prior_sd_sig_2 (numeric)  Standard deviation of normal prior on scale parameter of GPD of margin 2
+#' @param prior_mean_xi_1 (numeric)  Mean of normal prior on shape parameter of GPD of margin 1
+#' @param prior_sd_xi_1 (numeric)  Standard deviation of normal prior on shape parameter of GPD of margin 1
+#' @param prior_mean_xi_2 (numeric)  Mean of normal prior on shape parameter of GPD of margin 2
+#' @param prior_sd_xi_2 (numeric)  Standard deviation of normal prior on shape parameter of GPD of margin 2
+#'
+#' @param chains (numeric) see ?rstan::sampling
+#' @param iter (numeric) see ?rstan::sampling
+#' @param cores (numeric) see ?rstan::sampling
+#' @param warmup (numeric) see ?rstan::sampling
+#' @param thin (numeric) see ?rstan::sampling
+#'
+#' @return (list(estimate (numeric), post (list), fitted_model (stan model))) List of 3 elements,
+#' first element is the estimate of the GPD margin parameters as well as the Hüsler-Reiss dependence parameter, calculated as the mean of the posterior distribution.
+#' Second element are the posterior distribution samples. Third element is the full fitted stan model.
+#' @export
+#'
+#' @examples
+#' # sample from a Hüsler-Reiss copula
+#' copula_sample = rhr(1000, 2)
+#'
+#' # Transform margins to be GPD
+#' margin_1 = qgev(copula_sample[,1], loc = 1, scale = 1.2, shape = -0.11)
+#' margin_2 = qgev(copula_sample[,2], loc = 1.1, scale = 1.3, shape = -0.09)
+#'
+#' # fit margins and copula jointly
+#' fit_hrc_gp_bay(margin_1, margin_2)
+fit_hrc_gev_bay = function(x, y,
+                          prior_mean = 1,
+                          prior_sd = 1,
+                          prior_mean_xi_1 = 0,
+                          prior_sd_xi_1 = 1,
+                          prior_mean_sig_1 = 1,
+                          prior_sd_sig_1 = 1,
+                          prior_mean_xi_2 = 0,
+                          prior_sd_xi_2 = 1,
+                          prior_mean_sig_2 = 1,
+                          prior_sd_sig_2 = 1,
+                          prior_mean_loc_1 = 1,
+                          prior_sd_loc_1 = 1,
+                          prior_mean_loc_2 = 1,
+                          prior_sd_loc_2 = 1,
+                          chains = 2,
+                          iter = 1000,
+                          warmup = floor(iter/2),
+                          cores=2,
+                          thin = 1){
+
+  # load compiled stan model
+  # prepare data for stan model
+  stan_data = list(x = x,
+                   y = y,
+                   prior_mean = prior_mean,
+                   prior_sd = prior_sd,
+                   N = length(x),
+                   prior_mean_xi_1 = prior_mean_xi_1,
+                   prior_sd_xi_1 = prior_sd_xi_1,
+                   prior_mean_sig_1 = prior_mean_sig_1,
+                   prior_sd_sig_1 = prior_sd_sig_1,
+                   prior_mean_xi_2 = prior_mean_xi_2,
+                   prior_sd_xi_2 = prior_sd_xi_2,
+                   prior_mean_sig_2 = prior_mean_sig_2,
+                   prior_sd_sig_2 = prior_sd_sig_2,
+                   prior_mean_loc_1 = prior_mean_loc_1,
+                   prior_sd_loc_1 = prior_sd_loc_1,
+                   prior_mean_loc_2 = prior_mean_loc_2,
+                   prior_sd_loc_2 = prior_sd_loc_2)
+
+  # sample from stan model
+  fitted_model <- rstan::sampling(stanmodels$bivarhrcgev,
+                                  data=stan_data,
+                                  chains = chains,
+                                  iter = iter,
+                                  cores = cores,
+                                  warmup = warmup,
+                                  thin = thin)
+
+  # extract posterior distribution
+  posterior_samples = rstan::extract(fitted_model)
+
+  list(estimate = c(mean(posterior_samples$loc_1),
+                    mean(posterior_samples$scale_1),
+                    mean(posterior_samples$shape_1),
+                    mean(posterior_samples$loc_2),
+                    mean(posterior_samples$scale_2),
+                    mean(posterior_samples$shape_2),
+                    mean(posterior_samples$lambda)),
+       post = list(loc_1 = posterior_samples$loc_1,
+                   scale_1 = posterior_samples$scale_1,
+                   shape_1 = posterior_samples$shape_1,
+                   loc_2 = posterior_samples$loc_2,
+                   scale_2 = posterior_samples$scale_2,
+                   shape_2 = posterior_samples$shape_2,
+                   lambda = posterior_samples$lambda),
+       fitted_model = fitted_model)
+}
+
+
 
