@@ -2,7 +2,7 @@
 % Please edit documentation in R/bivariate_hr.R
 \name{fit_hrc_gev}
 \alias{fit_hrc_gev}
-\title{Jointly fitting a bi-variate Hüsler-Reiss copula and generlaised Pareto margins}
+\title{Jointly fitting a bi-variate Hüsler-Reiss copula and GEV}
 \usage{
 fit_hrc_gev(x, y, initial_est)
 }
@@ -19,7 +19,7 @@ first element is the estimates of the generalised Pareto distribution parameters
 second element is the estimated 95% confidence interval from the Hessian, the i-th row corresponds to the i-th estimate.
 }
 \description{
-Jointly fitting a bi-variate Hüsler-Reiss copula and generlaised Pareto margins
+Jointly fitting a bi-variate Hüsler-Reiss copula and GEV
 }
 \examples{
 # sample from a Hüsler-Reiss copula

@@ -335,6 +335,75 @@ fit_gpd_bay = function(x,
 
 
 
+#' Fitting a GEV in a bayesian framework
+#'
+#' @param x (numeric) data
+#' @param prior_mean_loc (numeric) Mean of normal prior of location parameter of GEV distribution
+#' @param prior_sd_loc (numeric) Standard deviation of normal prior of location parameter of GEV distribution
+#' @param prior_mean_sig (numeric) Mean of normal prior of scale parameter of GEV distribution
+#' @param prior_sd_sig (numeric) Standard deviation of normal prior of scale parameter of GEV distribution
+#' @param prior_mean_xi (numeric) Mean of normal prior of shape parameter of GEV distribution
+#' @param prior_sd_xi (numeric) Standard deviation of normal prior of shape parameter of GEV distribution
+#' @param chains (numeric) see ?rstan::sampling
+#' @param iter (numeric) see ?rstan::sampling
+#' @param cores (numeric) see ?rstan::sampling
+#' @param warmup (numeric) see ?rstan::sampling
+#' @param thin (numeric) see ?rstan::sampling
+#'
+#' @return (list(estimate (numeric), post (numeric), fitted_model (stan model))) List of 3 elements,
+#' first element is the estimate of the GEV parameters, calculated as the mean of the posterior distribution.
+#' Second element is the posterior distribution samples. Third element is the full fitted stan model.
+#' @export
+#'
+#' @examples
+#' x = rgev(100, scale = 1, scale = 1, shape = -0.1)
+#' fit_gev_bay(x)
+fit_gev_bay = function(x,
+                       prior_mean_loc = 1,
+                       prior_sd_loc = 1,
+                       prior_mean_xi = 0,
+                       prior_sd_xi = 1,
+                       prior_mean_sig = 1,
+                       prior_sd_sig = 0,
+                       chains = 2,
+                       iter = 2000,
+                       warmup = floor(iter/2),
+                       cores=2,
+                       thin = 1){
+
+  stan_data = list(y = x,
+                   N = length(x),
+                   prior_mean_loc = prior_mean_loc,
+                   prior_sd_loc = prior_sd_loc,
+                   prior_mean_xi = prior_mean_xi,
+                   prior_sd_xi = prior_sd_xi,
+                   prior_mean_sig = prior_mean_sig,
+                   prior_sd_sig = prior_sd_sig)
+
+  # sample from stan model
+  fitted_model <- rstan::sampling(stanmodels$gev,
+                                  data=stan_data,
+                                  chains = chains,
+                                  iter = iter,
+                                  cores = cores,
+                                  warmup = warmup,
+                                  thin = thin)
+
+  # extract posterior distribution
+  posterior_samples = rstan::extract(fitted_model)
+
+  list(estimate = c(mean(posterior_samples$loc), mean(posterior_samples$scale), mean(posterior_samples$shape)),
+       post = list(scale = posterior_samples$loc,
+                   scale = posterior_samples$scale,
+                   shape = posterior_samples$shape),
+       fitted_model = fitted_model)
+}
+
+
+
+
+
+
 # negative log likelihood of copula and margins
 hrc_gev_nll = function(pars, x, y){
 
@@ -344,8 +413,8 @@ hrc_gev_nll = function(pars, x, y){
 
 
   if(pars[5] <= 0) return(100^100)
-  if((pars[6] < 0) & any(x > (pars[4] - (pars[5]/pars[6])))) return(100^100)
-  if((pars[6] > 0) & any(x < (pars[4] - (pars[5]/pars[6])))) return(100^100)
+  if((pars[6] < 0) & any(y > (pars[4] - (pars[5]/pars[6])))) return(100^100)
+  if((pars[6] > 0) & any(y < (pars[4] - (pars[5]/pars[6])))) return(100^100)
 
 
   if(pars[7]<=0 | pars[7]>15) return(100^100)
@@ -369,7 +438,7 @@ hrc_gev_nll = function(pars, x, y){
   LL
 }
 
-#' Jointly fitting a bi-variate Hüsler-Reiss copula and generlaised Pareto margins
+#' Jointly fitting a bi-variate Hüsler-Reiss copula and GEV
 #'
 #' @param x (numeric) margin 1, assumed to be GEV distributed
 #' @param y (numeric) margin 2, assumed to be GEV distributed
@@ -411,7 +480,7 @@ fit_hrc_gev = function(x, y, initial_est){
     this_se = calc_se(this_fit$hessian)
     # return estimate and CI
     list(estimate = this_fit$par,
-         ci = matrix(c(this_fit$par-this_se, this_fit$par+this_se), nrow = 5))
+         ci = matrix(c(this_fit$par-this_se, this_fit$par+this_se), nrow = 7))
   }
 }
 
@@ -589,7 +658,7 @@ fit_hrc_gp_bay = function(x, y,
 #' margin_2 = qgev(copula_sample[,2], loc = 1.1, scale = 1.3, shape = -0.09)
 #'
 #' # fit margins and copula jointly
-#' fit_hrc_gp_bay(margin_1, margin_2)
+#' fit_hrc_gev_bay(margin_1, margin_2)
 fit_hrc_gev_bay = function(x, y,
                           prior_mean = 1,
                           prior_sd = 1,
@@ -660,5 +729,130 @@ fit_hrc_gev_bay = function(x, y,
        fitted_model = fitted_model)
 }
 
-
-
+#
+#
+# copula_sample = hrd::rhr(1000, 2)
+# #
+# # Transform margins to be GPD
+# margin_1 = hrd::qgev(copula_sample[,1], loc = 1.2,  scale = 1, shape = -0.2)
+# margin_2 = hrd::qgev(copula_sample[,2], loc = 0.9, scale = 1, shape = -0.2)
+# # #
+#
+# hrd::fit_gevd(margin_1)
+# # # # fit margins and copula jointly
+# stan_data = list(x = margin_1,
+#                  y = margin_2,
+#                  prior_mean = 1,
+#                  prior_sd = 1,
+#                  N = length(margin_1),
+#                  prior_mean_xi_1 = 0,
+#                  prior_sd_xi_1 = 0.5,
+#                  prior_mean_sig_1 = 1,
+#                  prior_sd_sig_1 = 1,
+#                  prior_mean_xi_2 = 0,
+#                  prior_sd_xi_2 = 0.5,
+#                  prior_mean_sig_2 = 1,
+#                  prior_sd_sig_2 = 1,
+#                  prior_mean_loc_1 = 1,
+#                  prior_sd_loc_1 = 0.2,
+#                  prior_mean_loc_2 = 1,
+#                  prior_sd_loc_2 = 0.2)
+#
+# fitted_model = rstan::stan(
+#   file = "inst/stan/bivarhrcgev.stan",
+#   data = stan_data,
+#   # init = 0,
+#   iter = 1000,
+#   cores = 1,
+#   chains = 1)
+#
+#
+#
+#
+#
+# evd::pgev(margin_1, 1, 1.87918, 0.166335)
+#
+# evd::pgev(margin_2, -89.6998, 5.71705, -0.0620918)
+#
+#
+#
+#
+# loc_1 =4.99994
+# loc_2 =-89.6998
+# scale_1 =0.319944
+# scale_2 =5.71705
+# shape_1 =-0.239771
+# shape_2 =-0.0620918
+# lambda =3.43341
+#
+#
+#
+# # # # extract posterior distribution
+# # # posterior_samples = rstan::extract(fitted_model)
+# # #
+# # # list(estimate = mean(posterior_samples$lambda),
+# # #      post = posterior_samples$lambda,
+# # #      fitted_model = fitted_model)
+#
+#
+#
+#
+#
+#
+#
+# # Transform margins to be GPD
+# x = hrd::rgev(5000, loc = 1.2,  scale = 1, shape = -0.2)
+# # #
+# # # # fit margins and copula jointly
+# stan_data = list(x = x,
+#                  N = length(x),
+#                  prior_mean_xi = 0,
+#                  prior_sd_xi = 1,
+#                  prior_mean_sig = 1,
+#                  prior_sd_sig = 1,
+#                  prior_mean_loc = 1,
+#                  prior_sd_loc = 1)
+#
+#
+#
+# # #
+# fitted_model = rstan::stan(
+#   file = "inst/stan/gev.stan",
+#   data = stan_data,
+#   iter = 1000,
+#   init=0,
+#   cores = 2,
+#   chains = 2)
+#
+#
+#
+#
+#
+#
+#
+#
+# margin_1
+#
+# v =0
+# y =1.50848
+# loc_1 =-1.2955
+# loc_2 =2.93369
+# scale_1 =1.89384
+# scale_2 =0.200606
+# shape_1 =-0.302694
+# shape_2 =0.0659788
+# lambda =7.35677
+# evd::pgev(1.50848, 2.93369, 0.200606, 0.0659788)
+#
+#
+# margin_2
+# -43.0397 - (1.92204/-0.0402527)
+#
+# # #
+# # # # extract posterior distribution
+# # # posterior_samples = rstan::extract(fitted_model)
+# # #
+# # # list(estimate = mean(posterior_samples$lambda),
+# # #      post = posterior_samples$lambda,
+# # #      fitted_model = fitted_model)
+#

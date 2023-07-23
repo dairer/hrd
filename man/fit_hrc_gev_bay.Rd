@@ -88,5 +88,5 @@ margin_1 = qgev(copula_sample[,1], loc = 1, scale = 1.2, shape = -0.11)
 margin_2 = qgev(copula_sample[,2], loc = 1.1, scale = 1.3, shape = -0.09)
 
 # fit margins and copula jointly
-fit_hrc_gp_bay(margin_1, margin_2)
+fit_hrc_gev_bay(margin_1, margin_2)
 }

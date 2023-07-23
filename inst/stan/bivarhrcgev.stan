@@ -34,10 +34,15 @@ functions{
       reject(loc, scale, shape)
 
     if((shape > 0) && (z < (loc - (scale/shape))))
-          reject(loc, scale, shape)
+        reject(loc, scale, shape)
 
     if(shape != 0){
-      tm = (1 + shape*((z - loc)/scale))^(-1/shape);
+      if((1 + shape*((z - loc)/scale)) > 0){
+        tm = (1 + shape*((z - loc)/scale))^(-1/shape);
+      }
+      else{
+        tm = 0^(-1/shape);
+      }
     }else{
       tm = exp(-(z - loc)/scale);
     }
@@ -58,39 +63,64 @@ functions{
       real density_HR;
       real LL;
 
-
+//   print("loc_1 =", loc_1);
+//   print("loc_2 =", loc_2);
+//   print("scale_1 =", scale_1);
+//   print("scale_2 =", scale_2);
+//   print("shape_1 =", shape_1);
+//   print("shape_2 =", shape_2);
+//   print("lambda =", lambda);
 
       if(lambda<=0){
         reject(lambda);
       }
 
       if(scale_1 <= 0)
-        reject(scale_1)
+        reject(loc_1, scale_1, shape_1)
 
       if((shape_1 < 0) && (x > (loc_1 - (scale_1/shape_1))))
         reject(loc_1, scale_1, shape_1)
 
-      if((shape_1 > 0) && (z < (loc_1 - (scale_1/shape_1))))
+      if((shape_1 > 0) && (x < (loc_1 - (scale_1/shape_1))))
             reject(loc_1, scale_1, shape_1)
 
       if(scale_2 <= 0)
-        reject(scale_2)
-
-      if((shape_2 < 0) && (x > (loc_2 - (scale_2/shape_2))))
         reject(loc_2, scale_2, shape_2)
 
-      if((shape_2 > 0) && (z < (loc_2 - (scale_2/shape_2))))
+      if((shape_2 < 0) && (y > (loc_2 - (scale_2/shape_2))))
+        reject(loc_2, scale_2, shape_2)
+
+      if((shape_2 > 0) && (y < (loc_2 - (scale_2/shape_2))))
             reject(loc_2, scale_2, shape_2)
 
       // likelihood margin 1
       density_marg_1 = gev_likelihood(x, loc_1, shape_1, scale_1);
-      if(density_marg_1 <=0){
+      if(density_marg_1 < 0){
+//
+//           print("loc_1 =", loc_1);
+//           print("loc_2 =", loc_2);
+//           print("scale_1 =", scale_1);
+//           print("scale_2 =", scale_2);
+//           print("shape_1 =", shape_1);
+//           print("shape_2 =", shape_2);
+//           print("lambda =", lambda);
+
+
         reject(loc_1, shape_1, scale_1);
       }
 
       // likelihood margin 2
-      density_marg_2 = gev_likelihood(y, loc_1, shape_2, scale_2);
-      if(density_marg_2 <=0){
+      density_marg_2 = gev_likelihood(y, loc_2, shape_2, scale_2);
+      if(density_marg_2 < 0){
+
+          // print("loc_1 =", loc_1);
+          // print("loc_2 =", loc_2);
+          // print("scale_1 =", scale_1);
+          // print("scale_2 =", scale_2);
+          // print("shape_1 =", shape_1);
+          // print("shape_2 =", shape_2);
+          // print("lambda =", lambda);
+
         reject(loc_2, shape_2, scale_2);
       }
 
@@ -99,15 +129,63 @@ functions{
       v = gev_distribution(y, loc_2, shape_2, scale_2);
 
       if(u<=0){
+
+          // print("u =", u);
+          // print("x =", x);
+          //
+          // print("loc_1 =", loc_1);
+          // print("loc_2 =", loc_2);
+          // print("scale_1 =", scale_1);
+          // print("scale_2 =", scale_2);
+          // print("shape_1 =", shape_1);
+          // print("shape_2 =", shape_2);
+          // print("lambda =", lambda);
+
         reject(loc_1, shape_1, scale_1);
       }
       if(u>=1){
+
+        // print("u =", u);
+        //           print("x =", x);
+        //
+        // print("loc_1 =", loc_1);
+        // print("loc_2 =", loc_2);
+        // print("scale_1 =", scale_1);
+        // print("scale_2 =", scale_2);
+        // print("shape_1 =", shape_1);
+        // print("shape_2 =", shape_2);
+        // print("lambda =", lambda);
+
         reject(loc_1, shape_1, scale_1);
       }
       if(v<=0){
+
+        // print("v =", v);
+        //           print("y =", y);
+        //
+        // print("loc_1 =", loc_1);
+        // print("loc_2 =", loc_2);
+        // print("scale_1 =", scale_1);
+        // print("scale_2 =", scale_2);
+        // print("shape_1 =", shape_1);
+        // print("shape_2 =", shape_2);
+        // print("lambda =", lambda);
+
         reject(loc_2, shape_2, scale_2);
       }
       if(v>=1){
+
+        // print("v =", v);
+        //           print("y =", y);
+        //
+        // print("loc_1 =", loc_1);
+        // print("loc_2 =", loc_2);
+        // print("scale_1 =", scale_1);
+        // print("scale_2 =", scale_2);
+        // print("shape_1 =", shape_1);
+        // print("shape_2 =", shape_2);
+        // print("lambda =", lambda);
+
         reject(loc_2, shape_2, scale_2);
       }
 
@@ -122,13 +200,22 @@ functions{
       (lambda/2) * -1 / log(v) * exp(-0.5 * a^2) / sqrt(2 * pi())));
 
 
-    if(density_HR<=0){
-      reject(loc_1, loc_2, shape_1, scale_1, shape_2, scale_2, lambda);
+    if(density_HR<0){
+      reject(lambda);
     }
 
     LL = log(density_HR*density_marg_1*density_marg_2);
 
     if(LL < (-10^50)){
+
+      // print("loc_1 =", loc_1);
+      // print("loc_2 =", loc_2);
+      // print("scale_1 =", scale_1);
+      // print("scale_2 =", scale_2);
+      // print("shape_1 =", shape_1);
+      // print("shape_2 =", shape_2);
+      // print("lambda =", lambda);
+
       reject(loc_1, loc_2, shape_1, scale_1, shape_2, scale_2);
     }
 
@@ -138,8 +225,8 @@ functions{
 
 data {
   int <lower = 0> N;
-  real<lower = 0> x[N];
-  real<lower = 0> y[N];
+  real x[N];
+  real y[N];
   real <lower=0> prior_mean;
   real <lower=0> prior_sd;
   real <lower=-0.4, upper = 0.4> prior_mean_xi_1;
@@ -155,6 +242,9 @@ data {
   real <lower=0>prior_mean_loc_2;
   real <lower=0>prior_sd_loc_2;
   }
+
+
+
 
 transformed data {
   real maxObs1 = max(x);
@@ -182,22 +272,22 @@ parameters {
   real <lower=-0.5, upper = 0.5> shape_1;
   real <lower=-0.5, upper = 0.5> shape_2;
 
- real<lower=if_else(shape_1 < 0,  ((scale_1/shape_1) + maxObs1), -negative_infinity()),
-      upper=if_else(shape_1 > 0,  ((scale_1/shape_1) + minObs1), positive_infinity()) > loc_1;
+// //equiv to if_else(shape < 0,  ((scale/shape) + maxObs1), negative_infinity())
+ real<lower= ((shape_1 < 0) ? ((scale_1/shape_1) + maxObs1) :  negative_infinity()),
+      upper= ((shape_1 > 0) ? ((scale_1/shape_1) + minObs1) : positive_infinity()) > loc_1;
 
- real<lower=if_else(shape_2 < 0,  ((scale_2/shape_2) + maxObs2), -negative_infinity()),
-      upper=if_else(shape_2 > 0,  ((scale_2/shape_2) + minObs2), positive_infinity()) > loc_2;
-
+ real<lower= ((shape_2 < 0) ? ((scale_2/shape_2) + maxObs2) :  negative_infinity()),
+      upper= ((shape_2 > 0) ? ((scale_2/shape_2) + minObs2) : positive_infinity()) > loc_2;
 }
-
-
 
 model {
   lambda ~ normal(prior_mean,prior_sd); // prior on HR dependence parameter
+
   loc_1 ~ normal(prior_mean_loc_1,prior_sd_loc_1);
-  loc_2 ~ normal(prior_mean_loc_2,prior_sd_loc_2);
   shape_1 ~ normal(prior_mean_xi_1,prior_sd_xi_1);
   scale_1 ~ normal(prior_mean_sig_1,prior_sd_sig_1);
+
+  loc_2 ~ normal(prior_mean_loc_2,prior_sd_loc_2);
   shape_2 ~ normal(prior_mean_xi_2,prior_sd_xi_2);
   scale_2 ~ normal(prior_mean_sig_2,prior_sd_sig_2);
 

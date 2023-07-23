@@ -63,13 +63,15 @@ pgev = function(x, loc, scale, shape){
 
   tm = rep(NA, length(x))
   if(shape != 0){
-    tm = (1 + shape*((x - loc)/scale))^(-1/shape)
+    tm = pmin((1 + shape*((x - loc)/scale)), 0)^(-1/shape)
   }else{
     tm = exp(-(x - loc)/scale)
   }
 
   exp(-tm)
 }
+
+
 
 
 
