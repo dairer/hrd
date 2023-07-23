@@ -16,7 +16,8 @@ fit_gev_bay(
   iter = 2000,
   warmup = floor(iter/2),
   cores = 2,
-  thin = 1
+  thin = 1,
+  init = 0
 )
 }
 \arguments{
@@ -43,6 +44,8 @@ fit_gev_bay(
 \item{cores}{(numeric) see ?rstan::sampling}
 
 \item{thin}{(numeric) see ?rstan::sampling}
+
+\item{init}{(numeric) see ?rstan::init}
 }
 \value{
 (list(estimate (numeric), post (numeric), fitted_model (stan model))) List of 3 elements,
