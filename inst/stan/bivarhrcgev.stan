@@ -63,13 +63,6 @@ functions{
       real density_HR;
       real LL;
 
-//   print("loc_1 =", loc_1);
-//   print("loc_2 =", loc_2);
-//   print("scale_1 =", scale_1);
-//   print("scale_2 =", scale_2);
-//   print("shape_1 =", shape_1);
-//   print("shape_2 =", shape_2);
-//   print("lambda =", lambda);
 
       if(lambda<=0){
         reject(lambda);
@@ -97,39 +90,18 @@ functions{
       density_marg_1 = gev_likelihood(x, loc_1, shape_1, scale_1);
       if(density_marg_1 < 0 || density_marg_2 >=1){
         density_marg_1 = 0;
-//
-//           print("loc_1 =", loc_1);
-//           print("loc_2 =", loc_2);
-//           print("scale_1 =", scale_1);
-//           print("scale_2 =", scale_2);
-//           print("shape_1 =", shape_1);
-//           print("shape_2 =", shape_2);
-//           print("lambda =", lambda);
-
-
-        // reject(loc_1, shape_1, scale_1);
       }
 
       // likelihood margin 2
       density_marg_2 = gev_likelihood(y, loc_2, shape_2, scale_2);
       if(density_marg_2 <= 0 || density_marg_2 >=1){
-
           density_marg_2 = 0;
-          // print("loc_1 =", loc_1);
-          // print("loc_2 =", loc_2);
-          // print("scale_1 =", scale_1);
-          // print("scale_2 =", scale_2);
-          // print("shape_1 =", shape_1);
-          // print("shape_2 =", shape_2);
-          // print("lambda =", lambda);
-//
-//         reject(loc_2, shape_2, scale_2);
       }
 
 
       if(density_marg_2 > 0 && density_marg_1 > 0){
 
-              // transform data to uniform
+      // transform data to uniform
       u = gev_distribution(x, loc_1, shape_1, scale_1);
       v = gev_distribution(y, loc_2, shape_2, scale_2);
 
@@ -244,28 +216,27 @@ data {
   real y[N];
   real <lower=0> prior_mean;
   real <lower=0> prior_sd;
-  real <lower=-0.4, upper = 0.4> prior_mean_xi_1;
-  real <lower=0>prior_sd_xi_1;
   real <lower=0>prior_mean_sig_1;
   real <lower=0>prior_sd_sig_1;
-  real <lower=0>prior_mean_loc_1;
+  real prior_mean_loc_1;
   real <lower=0>prior_sd_loc_1;
-  real <lower=-0.4, upper = 0.4>prior_mean_xi_2;
-  real <lower=0>prior_sd_xi_2;
+  real shape_lower_1;
+  real shape_upper_1;
   real <lower=0>prior_mean_sig_2;
   real <lower=0>prior_sd_sig_2;
-  real <lower=0>prior_mean_loc_2;
+  real prior_mean_loc_2;
   real <lower=0>prior_sd_loc_2;
+  real shape_lower_2;
+  real shape_upper_2;
   }
 
 
-
-
 transformed data {
-  real maxObs1 = max(x);
-  real maxObs2 = max(y);
-  real minObs1 = min(x);
-  real minObs2 = min(y);
+  real maxObs_1 = max(x);
+  real maxObs_2 = max(y);
+
+  real minObs_1 = min(x);
+  real minObs_2 = min(y);
 
 }
 
@@ -277,7 +248,6 @@ transformed data {
 //   real <lower=-0.49, upper = 0.49> shape_2;
 // }
 
-
 parameters {
   real <lower=0, upper = 10> lambda;
   real <lower=0> scale_1;
@@ -286,23 +256,33 @@ parameters {
   real <lower=-0.5, upper = 0.5> shape_2;
 
 // //equiv to if_else(shape < 0,  ((scale/shape) + maxObs1), negative_infinity())
- real<lower= ((shape_1 < 0) ? ((scale_1/shape_1) + maxObs1) :  negative_infinity()),
-      upper= ((shape_1 > 0) ? ((scale_1/shape_1) + minObs1) : positive_infinity()) > loc_1;
+ // real<lower= ((shape_1 < 0) ? ((scale_1/shape_1) + maxObs1) :  negative_infinity()),
+ //      upper= ((shape_1 > 0) ? ((scale_1/shape_1) + minObs1) : positive_infinity()) > loc_1;
+ //
+ // real<lower= ((shape_2 < 0) ? ((scale_2/shape_2) + maxObs2) :  negative_infinity()),
+ //      upper= ((shape_2 > 0) ? ((scale_2/shape_2) + minObs2) : positive_infinity()) > loc_2;
 
- real<lower= ((shape_2 < 0) ? ((scale_2/shape_2) + maxObs2) :  negative_infinity()),
-      upper= ((shape_2 > 0) ? ((scale_2/shape_2) + minObs2) : positive_infinity()) > loc_2;
+
+   real<lower=(shape_1 > 0 ? minObs_1 : negative_infinity()),
+       upper=(shape_1 > 0 ? positive_infinity() : maxObs_1 )> loc_1;
+
+   real<lower=(shape_2 > 0 ? minObs_2 : negative_infinity()),
+       upper=(shape_2 > 0 ? positive_infinity() : maxObs_2 )> loc_2;
+
+
 }
 
 model {
   lambda ~ normal(prior_mean,prior_sd); // prior on HR dependence parameter
 
   loc_1 ~ normal(prior_mean_loc_1,prior_sd_loc_1);
-  shape_1 ~ normal(prior_mean_xi_1,prior_sd_xi_1);
+  shape_1 ~ uniform(shape_lower_1,shape_upper_1)T[shape_lower_1,shape_upper_1];
   scale_1 ~ normal(prior_mean_sig_1,prior_sd_sig_1);
 
   loc_2 ~ normal(prior_mean_loc_2,prior_sd_loc_2);
-  shape_2 ~ normal(prior_mean_xi_2,prior_sd_xi_2);
+  shape_2 ~ uniform(shape_lower_2,shape_upper_2)T[shape_lower_2,shape_upper_2];
   scale_2 ~ normal(prior_mean_sig_2,prior_sd_sig_2);
+
 
   for(n in 1:N){
     target += HuslerReiss(x[n], y[n], loc_1, loc_2, scale_1,scale_2,shape_1,shape_2,lambda);

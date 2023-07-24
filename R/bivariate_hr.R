@@ -658,29 +658,29 @@ fit_hrc_gp_bay = function(x, y,
 #'
 #' @examples
 #' # sample from a Hüsler-Reiss copula
-#' copula_sample = rhr(1000, 2)
+#' #copula_sample = rhr(1000, 2)
 #'
 #' # Transform margins to be GPD
-#' margin_1 = qgev(copula_sample[,1], loc = 1, scale = 1.2, shape = -0.11)
-#' margin_2 = qgev(copula_sample[,2], loc = 1.1, scale = 1.3, shape = -0.09)
+#' # margin_1 = qgev(copula_sample[,1], loc = 1, scale = 1.2, shape = -0.11)
+#' #margin_2 = qgev(copula_sample[,2], loc = 1.1, scale = 1.3, shape = -0.09)
 #'
 #' ## fit margins and copula jointly
 #' #fit_hrc_gev_bay(margin_1, margin_2)
 fit_hrc_gev_bay = function(x, y,
                           prior_mean = 1,
                           prior_sd = 0.5,
-                          prior_mean_xi_1 = 0,
-                          prior_sd_xi_1 = 0.5,
                           prior_mean_sig_1 = 1,
-                          prior_sd_sig_1 = 0.5,
-                          prior_mean_xi_2 = 0,
-                          prior_sd_xi_2 = 0.5,
+                          prior_sd_sig_1 = 10,
+                          prior_mean_loc_1 = 0,
+                          prior_sd_loc_1 = 10,
+                          shape_lower_1 = -0.49,
+                          shape_upper_1 = 0.49,
                           prior_mean_sig_2 = 1,
-                          prior_sd_sig_2 = 0.5,
-                          prior_mean_loc_1 = 1,
-                          prior_sd_loc_1 = 0.5,
-                          prior_mean_loc_2 = 1,
-                          prior_sd_loc_2 = 0.5,
+                          prior_sd_sig_2 = 10,
+                          prior_mean_loc_2 = 0,
+                          prior_sd_loc_2 = 10,
+                          shape_lower_2 = -0.49,
+                          shape_upper_2 = 0.49,
                           chains = 2,
                           iter = 1000,
                           warmup = floor(iter/2),
@@ -688,25 +688,27 @@ fit_hrc_gev_bay = function(x, y,
                           thin = 1,
                           init = 'random'){
 
+
+
   # load compiled stan model
   # prepare data for stan model
   stan_data = list(x = x,
                    y = y,
+                   N = length(x),
                    prior_mean = prior_mean,
                    prior_sd = prior_sd,
-                   N = length(x),
-                   prior_mean_xi_1 = prior_mean_xi_1,
-                   prior_sd_xi_1 = prior_sd_xi_1,
                    prior_mean_sig_1 = prior_mean_sig_1,
                    prior_sd_sig_1 = prior_sd_sig_1,
-                   prior_mean_xi_2 = prior_mean_xi_2,
-                   prior_sd_xi_2 = prior_sd_xi_2,
-                   prior_mean_sig_2 = prior_mean_sig_2,
-                   prior_sd_sig_2 = prior_sd_sig_2,
                    prior_mean_loc_1 = prior_mean_loc_1,
                    prior_sd_loc_1 = prior_sd_loc_1,
+                   shape_lower_1 = shape_lower_1,
+                   shape_upper_1 = shape_upper_1,
+                   prior_mean_sig_2 = prior_mean_sig_2,
+                   prior_sd_sig_2 = prior_sd_sig_2,
                    prior_mean_loc_2 = prior_mean_loc_2,
                    prior_sd_loc_2 = prior_sd_loc_2,
+                   shape_lower_2 = shape_lower_2,
+                   shape_upper_2 = shape_upper_2,
                    init = init)
 
   # sample from stan model
@@ -738,39 +740,40 @@ fit_hrc_gev_bay = function(x, y,
        fitted_model = fitted_model)
 }
 
-
 #
-# copula_sample = hrd::rhr(500, 0.2)
+#
+# copula_sample = hrd::rhr(1000, 0.2)
 # # #
 # # # Transform margins to be GPD
-# margin_1 = hrd::qgev(copula_sample[,1], loc = 1.1,  scale = 1, shape = -0.1)
-# margin_2 = hrd::qgev(copula_sample[,2], loc = 0.9, scale = 1, shape = 0.1)
-# # # #
-# #
-# # hrd::fit_gevd(margin_1)
-# # # # # fit margins and copula jointly
-# stan_data = list(x = margin_1,
+# margin_1 = hrd::qgev(copula_sample[,1], loc = 1,  scale = 1, shape = -0.1)
+# margin_2 = hrd::qgev(copula_sample[,2], loc = 1, scale = 1, shape = -0.1)
+# # # # #
+# # #
+# # # hrd::fit_gevd(margin_1)
+# # # # # # fit margins and copula jointly
+# stan_data = list(N = 1000,
+#                  x = margin_1,
 #                  y = margin_2,
 #                  prior_mean = 0.5,
 #                  prior_sd = 1,
-#                  N = length(margin_1),
-#                  prior_mean_xi_1 = 0,
-#                  prior_sd_xi_1 = 0.5,
 #                  prior_mean_sig_1 = 1,
-#                  prior_sd_sig_1 = 0.5,
-#                  prior_mean_xi_2 = 0,
-#                  prior_sd_xi_2 = 0.5,
+#                  prior_sd_sig_1 = 10,
+#                  prior_mean_loc_1 = 0,
+#                  prior_sd_loc_1 = 10,
+#                  shape_lower_1 = -0.3,
+#                  shape_upper_1 = -0.01,
 #                  prior_mean_sig_2 = 1,
-#                  prior_sd_sig_2 = 0.5,
-#                  prior_mean_loc_1 = 1,
-#                  prior_sd_loc_1 = 0.5,
-#                  prior_mean_loc_2 = 1,
-#                  prior_sd_loc_2 = 0.5)
+#                  prior_sd_sig_2 = 10,
+#                  prior_mean_loc_2 = 0,
+#                  prior_sd_loc_2 = 10,
+#                  shape_lower_2 = -0.3,
+#                  shape_upper_2 = -0.01)
+#
 #
 # fitted_model = rstan::stan(
 #   file = "inst/stan/bivarhrcgev.stan",
 #   data = stan_data,
-#   iter = 1000,
+#   iter = 2000,
 #   cores = 2,
 #   chains = 2,
 #   init_r = 1)
