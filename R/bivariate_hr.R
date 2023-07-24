@@ -414,35 +414,27 @@ fit_gev_bay = function(x,
 # negative log likelihood of copula and margins
 hrc_gev_nll = function(pars, x, y){
 
-  if(pars[2] <= 0) return(100^100)
-  if((pars[3] < 0) & any(x > (pars[1] - (pars[2]/pars[3])))) return(100^100)
-  if((pars[3] > 0) & any(x < (pars[1] - (pars[2]/pars[3])))) return(100^100)
+  if(pars[2] <= 0) return(1^100)
+  if((pars[3] < 0) & any(x > (pars[1] - (pars[2]/pars[3])))) return(1^100)
+  if((pars[3] > 0) & any(x < (pars[1] - (pars[2]/pars[3])))) return(1^100)
 
 
-  if(pars[5] <= 0) return(100^100)
-  if((pars[6] < 0) & any(y > (pars[4] - (pars[5]/pars[6])))) return(100^100)
-  if((pars[6] > 0) & any(y < (pars[4] - (pars[5]/pars[6])))) return(100^100)
+  if(pars[5] <= 0) return(1^100)
+  if((pars[6] < 0) & any(y > (pars[4] - (pars[5]/pars[6])))) return(1^100)
+  if((pars[6] > 0) & any(y < (pars[4] - (pars[5]/pars[6])))) return(1^100)
 
+  if(pars[7]<=0 | pars[7]>15) return(1^100)
 
-  if(pars[7]<=0 | pars[7]>15) return(100^100)
-
-  # likelihood of margin 1
-  llm1 = dgev(x, loc = pars[1], scale = pars[2], shape = pars[3])
-
-  # likelihood of margin 2
-  llm2 = dgev(y, loc = pars[4], scale = pars[5], shape = pars[6])
-
-  # likelihood of copula
+  # transform margins to uniform
   unif_1 = pgev(x, loc = pars[1], scale = pars[2], shape = pars[3])
   unif_2 = pgev(y, loc = pars[4], scale = pars[5], shape = pars[6])
+  if(any(unif_2 == unif_1)) return(1^100)
+
+  # get full likelihood
+  llm1 = dgev(x, loc = pars[1], scale = pars[2], shape = pars[3])
+  llm2 = dgev(y, loc = pars[4], scale = pars[5], shape = pars[6])
   llc = dhr(unif_1, unif_2, lambda = pars[7])
-
-  # full = likelihood
-  LL =  -sum(log(llm1*llm2*llc))
-
-  if(is.infinite(LL)) return(100^100)
-  if(is.na(LL)) return(100^100)
-  LL
+  -sum(log(llm1*llm2*llc))
 }
 
 #' Jointly fitting a bi-variate Hüsler-Reiss copula and GEV

@@ -63,16 +63,13 @@ pgev = function(x, loc, scale, shape){
 
   tm = rep(NA, length(x))
   if(shape != 0){
-    tm = pmin((1 + shape*((x - loc)/scale)), 0)^(-1/shape)
+    tm = pmax((1 + shape*((x - loc)/scale)), 0)^(-1/shape)
   }else{
     tm = exp(-(x - loc)/scale)
   }
 
   exp(-tm)
 }
-
-
-
 
 
 #' Quantile function of the generalised extreme value distribution (inverse cumulative distribution function)
