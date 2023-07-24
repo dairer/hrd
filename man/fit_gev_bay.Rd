@@ -6,34 +6,30 @@
 \usage{
 fit_gev_bay(
   x,
-  prior_mean_loc = 1,
-  prior_sd_loc = 1,
-  prior_mean_xi = 0,
-  prior_sd_xi = 1,
   prior_mean_sig = 1,
-  prior_sd_sig = 0,
+  prior_sd_sig = 5,
+  prior_mean_loc = 0,
+  prior_sd_loc = 5,
+  shape_lower = -0.49,
+  shape_upper = 0.49,
   chains = 2,
   iter = 2000,
   warmup = floor(iter/2),
   cores = 2,
   thin = 1,
-  init = 0
+  init = "random"
 )
 }
 \arguments{
 \item{x}{(numeric) data}
 
-\item{prior_mean_loc}{(numeric) Mean of normal prior of location parameter of GEV distribution}
-
-\item{prior_sd_loc}{(numeric) Standard deviation of normal prior of location parameter of GEV distribution}
-
-\item{prior_mean_xi}{(numeric) Mean of normal prior of shape parameter of GEV distribution}
-
-\item{prior_sd_xi}{(numeric) Standard deviation of normal prior of shape parameter of GEV distribution}
-
 \item{prior_mean_sig}{(numeric) Mean of normal prior of scale parameter of GEV distribution}
 
 \item{prior_sd_sig}{(numeric) Standard deviation of normal prior of scale parameter of GEV distribution}
+
+\item{prior_mean_loc}{(numeric) Mean of normal prior of location parameter of GEV distribution}
+
+\item{prior_sd_loc}{(numeric) Standard deviation of normal prior of location parameter of GEV distribution}
 
 \item{chains}{(numeric) see ?rstan::sampling}
 
@@ -46,6 +42,10 @@ fit_gev_bay(
 \item{thin}{(numeric) see ?rstan::sampling}
 
 \item{init}{(numeric) see ?rstan::init}
+
+\item{prior_mean_xi}{(numeric) Mean of normal prior of shape parameter of GEV distribution}
+
+\item{prior_sd_xi}{(numeric) Standard deviation of normal prior of shape parameter of GEV distribution}
 }
 \value{
 (list(estimate (numeric), post (numeric), fitted_model (stan model))) List of 3 elements,
@@ -56,6 +56,6 @@ Second element is the posterior distribution samples. Third element is the full 
 Fitting a GEV in a bayesian framework
 }
 \examples{
-x = rgev(100, scale = 1, scale = 1, shape = -0.1)
+x = rgev(100, loc = 1, scale = 1, shape = -0.1)
 fit_gev_bay(x)
 }

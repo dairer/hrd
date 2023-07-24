@@ -1,39 +1,44 @@
 functions{
-
   // density of gev
-  real gev_likelihood(real z, real loc, real shape, real scale){
+  real gev_lpdf(vector z, real loc, real scale, real shape){
 
-    real tm;
+    int n = rows(z);
+    vector[n] a;
+    vector[n] b;
+    vector[n] c;
 
-    if(scale <= 0)
-      reject(scale)
+    real LL = 0;
 
-    if((shape < 0) && (z > (loc - (scale/shape))))
-      reject(loc, scale, shape)
-
-    if((shape > 0) && (z < (loc - (scale/shape))))
-          reject(loc, scale, shape)
-
-    if(shape != 0){
-      tm = (1 + shape*((z - loc)/scale))^(-1/shape);
+    if(shape > 0.00001 || shape < -0.00001){
+      for(i in 1:n){
+        a[i] = 1+shape*((z[i] - loc)/scale);
+        b[i] = pow(a[i], (-1/shape));
+        c[i] = log(a[i]);
+      }
+      LL = ((-1*n*log(scale)) - ((1+(1/shape))*sum(c)) - sum(b));
     }else{
-      tm = exp(-(z - loc)/scale);
+      for(i in 1:n){
+        a[i] = ((z[i] - loc)/scale);
+        b[i] = exp(-1*a[i]);
+      }
+     LL = (-n*log(scale) - sum(a) - sum(b));
     }
-
-    return log((1/scale)*(tm^(shape+1))*exp(-tm));
+    return(LL);
   }
-
 }
+
+
 
 data {
   int <lower = 0> N;
-  real x[N];
-  real <lower=-0.5, upper = 0.5> prior_mean_xi;
-  real <lower=0>prior_sd_xi;
+  vector[N] x;
   real <lower=0>prior_mean_sig;
   real <lower=0>prior_sd_sig;
-  real <lower=0>prior_mean_loc;
+  real prior_mean_loc;
   real <lower=0>prior_sd_loc;
+  real shape_lower;
+  real shape_upper;
+
   }
 
 transformed data {
@@ -45,26 +50,27 @@ transformed data {
 parameters {
   real <lower=0> scale;
   real <lower=-0.5, upper = 0.5> shape;
-
-// //equiv to if_else(shape < 0,  ((scale/shape) + maxObs1), negative_infinity())
- real<lower= ((shape < 0) ?  ((scale/shape) + maxObs) :  negative_infinity()),
-      upper=((shape > 0) ?   ((scale/shape) + minObs): positive_infinity()) > loc;
-
- //
- // real<lower=if_else( xi < 0, min_y + sigma / xi, negative_infinity() ),
- //       upper=if_else( xi > 0, positive_infinity(), max_y + sigma / xi )> mu;
+  // real  loc;
+  // real<lower=if_else( shape > 0, minObs, negative_infinity()),
+  //      upper=if_else( shape > 0, positive_infinity(), maxObs )> loc;
+  real<lower=(shape > 0 ? minObs : negative_infinity()),
+       upper=(shape > 0 ? positive_infinity() : maxObs )> loc;
 
 
+
+
+// // //equiv to if_else(shape < 0,  ((scale/shape) + maxObs1), negative_infinity())
+//  real<lower= ((shape < 0) ?  ((scale/shape) + maxObs) :  negative_infinity()),
+//       upper=((shape > 0) ?   ((scale/shape) + minObs): positive_infinity()) > loc;
+
+ // real<lower= ((shape < -0.00001) ? (maxObs + (scale/shape)) :  negative_infinity()),
+ //      upper=((shape > 0.00001) ?  (minObs + (scale/shape)): positive_infinity()) > loc;
 }
 
 
 model {
   loc ~ normal(prior_mean_loc,prior_sd_loc);
-  shape ~ normal(prior_mean_xi,prior_sd_xi);
+  shape ~ uniform(shape_lower,shape_upper)T[shape_lower,shape_upper];
   scale ~ normal(prior_mean_sig,prior_sd_sig);
-
-  for(n in 1:N){
-    target += gev_likelihood(x[n], loc, shape, scale);
-  }
+  x ~ gev(loc, scale, shape);
 }
-

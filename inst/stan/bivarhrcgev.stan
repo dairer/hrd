@@ -95,7 +95,8 @@ functions{
 
       // likelihood margin 1
       density_marg_1 = gev_likelihood(x, loc_1, shape_1, scale_1);
-      if(density_marg_1 < 0){
+      if(density_marg_1 < 0 || density_marg_2 >=1){
+        density_marg_1 = 0;
 //
 //           print("loc_1 =", loc_1);
 //           print("loc_2 =", loc_2);
@@ -106,13 +107,14 @@ functions{
 //           print("lambda =", lambda);
 
 
-        reject(loc_1, shape_1, scale_1);
+        // reject(loc_1, shape_1, scale_1);
       }
 
       // likelihood margin 2
       density_marg_2 = gev_likelihood(y, loc_2, shape_2, scale_2);
-      if(density_marg_2 < 0){
+      if(density_marg_2 <= 0 || density_marg_2 >=1){
 
+          density_marg_2 = 0;
           // print("loc_1 =", loc_1);
           // print("loc_2 =", loc_2);
           // print("scale_1 =", scale_1);
@@ -120,74 +122,81 @@ functions{
           // print("shape_1 =", shape_1);
           // print("shape_2 =", shape_2);
           // print("lambda =", lambda);
-
-        reject(loc_2, shape_2, scale_2);
+//
+//         reject(loc_2, shape_2, scale_2);
       }
 
-      // transform data to uniform
+
+      if(density_marg_2 > 0 && density_marg_1 > 0){
+
+              // transform data to uniform
       u = gev_distribution(x, loc_1, shape_1, scale_1);
       v = gev_distribution(y, loc_2, shape_2, scale_2);
 
-      if(u<=0){
-
-          // print("u =", u);
-          // print("x =", x);
-          //
-          // print("loc_1 =", loc_1);
-          // print("loc_2 =", loc_2);
-          // print("scale_1 =", scale_1);
-          // print("scale_2 =", scale_2);
-          // print("shape_1 =", shape_1);
-          // print("shape_2 =", shape_2);
-          // print("lambda =", lambda);
-
-        reject(loc_1, shape_1, scale_1);
-      }
-      if(u>=1){
-
-        // print("u =", u);
-        //           print("x =", x);
-        //
-        // print("loc_1 =", loc_1);
-        // print("loc_2 =", loc_2);
-        // print("scale_1 =", scale_1);
-        // print("scale_2 =", scale_2);
-        // print("shape_1 =", shape_1);
-        // print("shape_2 =", shape_2);
-        // print("lambda =", lambda);
-
-        reject(loc_1, shape_1, scale_1);
-      }
-      if(v<=0){
-
-        // print("v =", v);
-        //           print("y =", y);
-        //
-        // print("loc_1 =", loc_1);
-        // print("loc_2 =", loc_2);
-        // print("scale_1 =", scale_1);
-        // print("scale_2 =", scale_2);
-        // print("shape_1 =", shape_1);
-        // print("shape_2 =", shape_2);
-        // print("lambda =", lambda);
-
-        reject(loc_2, shape_2, scale_2);
-      }
-      if(v>=1){
-
-        // print("v =", v);
-        //           print("y =", y);
-        //
-        // print("loc_1 =", loc_1);
-        // print("loc_2 =", loc_2);
-        // print("scale_1 =", scale_1);
-        // print("scale_2 =", scale_2);
-        // print("shape_1 =", shape_1);
-        // print("shape_2 =", shape_2);
-        // print("lambda =", lambda);
-
-        reject(loc_2, shape_2, scale_2);
-      }
+      // if(u<=0){
+      //
+      //   u = 0 + 1e-9;
+      //     // print("u =", u);
+      //     // print("x =", x);
+      //     //
+      //     // print("loc_1 =", loc_1);
+      //     // print("loc_2 =", loc_2);
+      //     // print("scale_1 =", scale_1);
+      //     // print("scale_2 =", scale_2);
+      //     // print("shape_1 =", shape_1);
+      //     // print("shape_2 =", shape_2);
+      //     // print("lambda =", lambda);
+      //
+      //   // reject(loc_1, shape_1, scale_1);
+      // }
+      // if(u>=1){
+      //   u = 1 - 1e-9;
+      //
+      //   // print("u =", u);
+      //   //           print("x =", x);
+      //   //
+      //   // print("loc_1 =", loc_1);
+      //   // print("loc_2 =", loc_2);
+      //   // print("scale_1 =", scale_1);
+      //   // print("scale_2 =", scale_2);
+      //   // print("shape_1 =", shape_1);
+      //   // print("shape_2 =", shape_2);
+      //   // print("lambda =", lambda);
+      //
+      //   // reject(loc_1, shape_1, scale_1);
+      // }
+      // if(v<=0){
+      //   v = 0 + 1e-9;
+      //
+      //   // print("v =", v);
+      //   //           print("y =", y);
+      //   //
+      //   // print("loc_1 =", loc_1);
+      //   // print("loc_2 =", loc_2);
+      //   // print("scale_1 =", scale_1);
+      //   // print("scale_2 =", scale_2);
+      //   // print("shape_1 =", shape_1);
+      //   // print("shape_2 =", shape_2);
+      //   // print("lambda =", lambda);
+      //
+      //   // reject(loc_2, shape_2, scale_2);
+      // }
+      // if(v>=1){
+      //   v = 1- 1e-9;
+      //
+      //   // print("v =", v);
+      //   //           print("y =", y);
+      //   //
+      //   // print("loc_1 =", loc_1);
+      //   // print("loc_2 =", loc_2);
+      //   // print("scale_1 =", scale_1);
+      //   // print("scale_2 =", scale_2);
+      //   // print("shape_1 =", shape_1);
+      //   // print("shape_2 =", shape_2);
+      //   // print("lambda =", lambda);
+      //
+      //   // reject(loc_2, shape_2, scale_2);
+      // }
 
 
       z = log(log(u) / log(v));
@@ -200,26 +209,32 @@ functions{
       (lambda/2) * -1 / log(v) * exp(-0.5 * a^2) / sqrt(2 * pi())));
 
 
-    if(density_HR<0){
-      reject(lambda);
-    }
+      LL = log(density_HR*density_marg_1*density_marg_2);
+        return(LL);
+      }else{
+        return(negative_infinity());
+      }
 
-    LL = log(density_HR*density_marg_1*density_marg_2);
-
-    if(LL < (-10^50)){
-
-      // print("loc_1 =", loc_1);
-      // print("loc_2 =", loc_2);
-      // print("scale_1 =", scale_1);
-      // print("scale_2 =", scale_2);
-      // print("shape_1 =", shape_1);
-      // print("shape_2 =", shape_2);
-      // print("lambda =", lambda);
-
-      reject(loc_1, loc_2, shape_1, scale_1, shape_2, scale_2);
-    }
-
-    return(LL);
+      // }
+//
+//     if(LL < (-1^10)){
+//       LL = -1^10;
+//       // print("LL =", LL);
+//       // print("u =", u);
+//       // print("v =", v);
+//       //
+//       // print("loc_1 =", loc_1);
+//       // print("loc_2 =", loc_2);
+//       // print("scale_1 =", scale_1);
+//       // print("scale_2 =", scale_2);
+//       // print("shape_1 =", shape_1);
+//       // print("shape_2 =", shape_2);
+//       // print("lambda =", lambda);
+//       //
+//       // reject(loc_1, loc_2, shape_1, scale_1, shape_2, scale_2);
+//     }
+//
+//     return(LL);
     }
 }
 
@@ -254,7 +269,6 @@ transformed data {
 
 }
 
-
 // parameters {
 //   real <lower=0, upper = 5> lambda;
 //   real <lower=0.01, upper = 5> scale_1;
@@ -262,7 +276,6 @@ transformed data {
 //   real <lower=0.01, upper = 5> scale_2;
 //   real <lower=-0.49, upper = 0.49> shape_2;
 // }
-//
 
 
 parameters {
