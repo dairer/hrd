@@ -82,7 +82,7 @@ qgp = function(x, scale, shape){
 #'
 #' @examples
 #' rgp(n = 100, scale = 1, shape = 0)
-rgp = function(n, scale, shape) runif(n) %>% qgp(scale, shape)
+rgp = function(n, scale, shape) stats::runif(n) %>% qgp(scale, shape)
 
 # negative log likelihood function of the generalised Pareto distribution
 gp_ngll = function(par, x){
@@ -105,7 +105,7 @@ gp_ngll = function(par, x){
 #' x = rgp(500, scale = 1, shape = -0.3)
 #' fit_gpd(x)
 fit_gpd = function(x, initial_est = c(1,0)){
-  this_fit = optim(fn=gp_ngll,
+  this_fit = stats::optim(fn=gp_ngll,
                    par = initial_est,
                    x = x,
                    hessian = T)

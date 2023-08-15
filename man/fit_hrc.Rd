@@ -11,9 +11,7 @@ fit_hrc(u, v, initial_est)
 
 \item{v}{(numeric) Uniform margin of copula}
 
-\item{lambda}{(numeric) Dependence parameter of the Hüsler-Reiss copula}
-
-\item{log}{(logical) If true returns log-Likelihood, default is False}
+\item{initial_est}{(numeric) Starting point for optimisation algorithms estimation of dependence parameter lambda.}
 }
 \value{
 (list(estimate (numeric), ci (numeric))) List of 2 elements,

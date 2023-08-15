@@ -114,7 +114,7 @@ qgev = function(x, loc, scale, shape){
 #'
 #' @examples
 #' rgev(n = 100, loc = 1, scale = 1, shape = 0)
-rgev = function(n, loc, scale, shape) runif(n) %>% qgev(loc, scale, shape)
+rgev = function(n, loc, scale, shape) stats::runif(n) %>% qgev(loc, scale, shape)
 
 # negative log likelihood function of the generalised extreme value distribution
 gev_ngll = function(par, x){
@@ -144,7 +144,7 @@ gev_ngll = function(par, x){
 #' x = rgev(500, loc = 5, scale = 1, shape = -0.2)
 #' fit_gevd(x)
 fit_gevd = function(x, initial_est = c(0,1,0)){
-  this_fit = optim(fn=gev_ngll,
+  this_fit = stats::optim(fn=gev_ngll,
                    par = initial_est,
                    x = x,
                    hessian = T)
@@ -157,6 +157,6 @@ fit_gevd = function(x, initial_est = c(0,1,0)){
     this_se = calc_se(this_fit$hessian)
     # return estimate and CI
     list(estimate = this_fit$par,
-         ci = matrix(c(this_fit$par-this_se, this_fit$par+this_se), nrow = 2))
+         ci = matrix(c(this_fit$par-this_se, this_fit$par+this_se), nrow = 3))
   }
 }
