@@ -7,9 +7,6 @@
 `hrd` is a collection of functions to help implement, develop and fit
 Hüsler-Reiss distribution based models.
 
-`<details><summary>extra</summary>Peek a boo!</details>` \## Table of
-content
-
 **Introduction**
 
 > -   [Getting set up](#installation)
