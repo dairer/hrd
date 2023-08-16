@@ -71,9 +71,10 @@ ngll = function(pars, lcs, dt, vr, conditioned.site){
 #' @param lcs (list) List of matrices that describe locations of observations in corresponding position in list dt.
 #' @param vr (numeric) Variogram function, evaluates with "pars"
 #' @param conditioned.site (numeric) Site that is "conditioned" on.
+#' @param initial_est (numeric) Starting point of variogram parameter optimisation
 #'
 #' @return (numeric) Log-liklihood
 #' @export
-fit_rpareto_br = function(dt, lcs, vr, conditioned.site = 1){
-  optim(par = c(1 ,1), fn = ngll, hessian = T, lcs = lcs, dt = dt, vr = vr, conditioned.site = conditioned.site)
+fit_rpareto_br = function(dt, lcs, vr, conditioned.site = 1, initial_est = c(1,1)){
+  optim(par = initial_est, fn = ngll, hessian = T, lcs = lcs, dt = dt, vr = vr, conditioned.site = conditioned.site)
 }
