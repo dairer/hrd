@@ -16,7 +16,7 @@ Imports:
     ggplot2,
     magrittr,
     methods,
-    purrr
+    purrr (>= 1.0.1)
 Biarch: true
 Depends: 
     R (>= 3.4.0)
