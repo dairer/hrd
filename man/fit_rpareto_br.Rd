@@ -4,7 +4,7 @@
 \alias{fit_rpareto_br}
 \title{Estimate variogram parameters for Brown-Resnick process with changing or constant dimensions.}
 \usage{
-fit_rpareto_br(dt, lcs, vr, conditioned.site = 1)
+fit_rpareto_br(dt, lcs, vr, conditioned.site = 1, initial_est = c(1, 1))
 }
 \arguments{
 \item{dt}{(list) Observations of extreme process, with standarised margins.}
@@ -15,7 +15,7 @@ fit_rpareto_br(dt, lcs, vr, conditioned.site = 1)
 
 \item{conditioned.site}{(numeric) Site that is "conditioned" on.}
 
-\item{pars}{(numeric) Parameter values of variogram which parameterises the Brown-Resnick process.}
+\item{initial_est}{(numeric) Starting point of variogram parameter optimisation}
 }
 \value{
 (numeric) Log-liklihood
