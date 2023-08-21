@@ -76,7 +76,7 @@ ngll = function(pars, lcs, dt, vr, conditioned.site){
 #' @return (numeric) Log-liklihood
 #' @export
 fit_rpareto_br = function(dt, lcs, vr, conditioned.site = 1, initial_est = c(1,1)){
-  this_fit =  optim(par = initial_est, fn = ngll, hessian = T, lcs = lcs, dt = dt, vr = vr, conditioned.site = conditioned.site)
+  this_fit =  stats::optim(par = initial_est, fn = ngll, hessian = T, lcs = lcs, dt = dt, vr = vr, conditioned.site = conditioned.site)
 
   this_se = calc_se(this_fit$hessian)
   # return estimate and CI

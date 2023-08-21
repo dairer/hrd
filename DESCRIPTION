@@ -14,6 +14,8 @@ BugReports: https://github.com/dairer/hrd/issues
 RoxygenNote: 7.2.3
 Imports: 
     ggplot2,
+    RColorBrewer,
+    dplyr,
     magrittr,
     methods,
     purrr (>= 1.0.1)
