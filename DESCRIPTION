@@ -18,7 +18,7 @@ Imports:
     dplyr,
     magrittr,
     methods,
-    purrr (>= 1.0.1)
+    purrr
 Biarch: true
 Depends: 
     R (>= 3.4.0)
