@@ -31,7 +31,6 @@ hrd_exploritory = function(dat, data_scale = T){
     dplyr::mutate(chi = 2*stats::dnorm(1/lambda))
 }
 
-
 #' Estimate and plot matrix of dependence parameter of Hüsler-Reiss
 #'
 #' This function plots the estimated dependence matrix of the Hüsler-Reiss copula where data is on any scale. The function transforms the data to uniform margins using an empirical ranking.
@@ -56,8 +55,8 @@ explore_lambda = function(dat, lower_diag = T){
         dplyr::select(s1, s2, lambda))
   }
 
-  all_pairs$s1 = base::factor(all_pairs$s1, levels = base::unique(all_pairs$s1) %>% base::sort)
-  all_pairs$s2 = base::factor(all_pairs$s2, levels = base::unique(all_pairs$s2) %>% base::sort %>% base::rev)
+  all_pairs$s1 = base::factor(all_pairs$s1, levels = base::unique(all_pairs$s1) %>% sort)
+  all_pairs$s2 = base::factor(all_pairs$s2, levels = base::unique(all_pairs$s2) %>% sort %>% rev)
 
 
   all_pairs%>%
@@ -71,7 +70,6 @@ explore_lambda = function(dat, lower_diag = T){
                                                        vjust=0.5, hjust=1))
 
 }
-
 
 #' Estimate and plot matrix pairwise dependence measure
 #'
@@ -97,8 +95,8 @@ explore_chi = function(dat, lower_diag = T, lims = NA){
         dplyr::select(s1, s2, lambda, chi))
   }
 
-  all_pairs$s1 = base::factor(all_pairs$s1, levels = base::unique(all_pairs$s1) %>% base::sort)
-  all_pairs$s2 = base::factor(all_pairs$s2, levels = base::unique(all_pairs$s2) %>% base::sort %>% base::rev)
+  all_pairs$s1 = base::factor(all_pairs$s1, levels = base::unique(all_pairs$s1) %>% sort)
+  all_pairs$s2 = base::factor(all_pairs$s2, levels = base::unique(all_pairs$s2) %>% sort %>% rev)
 
 
   plt = all_pairs%>%
@@ -116,8 +114,6 @@ explore_chi = function(dat, lower_diag = T, lims = NA){
     plt + ggplot2::scale_fill_gradientn(colours = RColorBrewer::brewer.pal(10,"Spectral"), limits = lims)
   }
 }
-
-
 
 #' Calculate pairwise dependence measure
 #'
@@ -161,8 +157,8 @@ emp_chi = function(dat, u, data_scale = T, lower_diag = T){
         dplyr::select(s1, s2, lambda))
   }
 
-  all_pairs$s1 = base::factor(all_pairs$s1, levels = base::unique(all_pairs$s1) %>% base::sort)
-  all_pairs$s2 = base::factor(all_pairs$s2, levels = base::unique(all_pairs$s2) %>% base::sort %>% base::rev)
+  all_pairs$s1 = base::factor(all_pairs$s1, levels = base::unique(all_pairs$s1) %>% sort)
+  all_pairs$s2 = base::factor(all_pairs$s2, levels = base::unique(all_pairs$s2) %>% sort %>% rev)
 
 
 
@@ -170,7 +166,6 @@ emp_chi = function(dat, u, data_scale = T, lower_diag = T){
     dplyr::as_tibble() %>%
     dplyr::mutate(emp_chi = as.numeric(emp_chi))
 }
-
 
 #' Estimate (empirically) and plot matrix pairwise dependence measure
 #'
