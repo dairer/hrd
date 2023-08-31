@@ -2,7 +2,7 @@
 % Please edit documentation in R/exploritory.R
 \name{explore_lambda}
 \alias{explore_lambda}
-\title{This function plots the estimated dependence matrix of the Hüsler-Reiss copula where data is on any scale. The function transforms the data to uniform margins using an empirical ranking.}
+\title{Estimate and plot matrix of dependence parameter of Hüsler-Reiss}
 \usage{
 explore_lambda(dat, lower_diag = T)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/exploritory.R
 \name{explore_emp_chi}
 \alias{explore_emp_chi}
-\title{This function plots the extremal coefficient (chi) matrix estimated empirically.}
+\title{Estimate (empirically) and plot matrix pairwise dependence measure}
 \usage{
 explore_emp_chi(dat, u = 0.5, data_scale = T, lower_diag = T, lims = NA)
 }

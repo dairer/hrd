@@ -32,6 +32,8 @@ hrd_exploritory = function(dat, data_scale = T){
 }
 
 
+#' Estimate and plot matrix of dependence parameter of Hüsler-Reiss
+#'
 #' This function plots the estimated dependence matrix of the Hüsler-Reiss copula where data is on any scale. The function transforms the data to uniform margins using an empirical ranking.
 #'
 #' @param dat (data.frame or matrix) Each column corresponds to a different site/variable, with component-wise maxima in each row.
@@ -71,6 +73,8 @@ explore_lambda = function(dat, lower_diag = T){
 }
 
 
+#' Estimate and plot matrix pairwise dependence measure
+#'
 #' This function plots the estimated extremal coefficient (chi) matrix derived from an estimated dependence matrix of the Hüsler-Reiss copula where data is on any scale. The function transforms the data to uniform margins using an empirical ranking.
 #'
 #' @param dat (data.frame or matrix) Each column corresponds to a different site/variable, with component-wise maxima in each row.
@@ -115,7 +119,10 @@ explore_chi = function(dat, lower_diag = T, lims = NA){
 
 
 
+#' Calculate pairwise dependence measure
+#'
 #' Internal function used to estimate emprical pairwise extremal dependance coefficient
+#'
 #' @param dat (data.frame or matrix) Each column corresponds to a different site/variable, with observations in each row.
 #' @param u (numeric) Quantile at which to estimate extremal dependence coefficient
 #' @param lower_diag If TRUE, the default, plot lower diagonal elements of extremal coefficient (chi) matrix
@@ -165,6 +172,8 @@ emp_chi = function(dat, u, data_scale = T, lower_diag = T){
 }
 
 
+#' Estimate (empirically) and plot matrix pairwise dependence measure
+#'
 #' This function plots the extremal coefficient (chi) matrix estimated empirically.
 #'
 #' @param dat (data.frame or matrix) Each column corresponds to a different site/variable, each row is an observation.

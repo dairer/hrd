@@ -2,7 +2,7 @@
 % Please edit documentation in R/exploritory.R
 \name{emp_chi}
 \alias{emp_chi}
-\title{Internal function used to estimate emprical pairwise extremal dependance coefficient}
+\title{Calculate pairwise dependence measure}
 \usage{
 emp_chi(dat, u, data_scale = T, lower_diag = T)
 }

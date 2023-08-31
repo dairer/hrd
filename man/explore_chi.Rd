@@ -2,7 +2,7 @@
 % Please edit documentation in R/exploritory.R
 \name{explore_chi}
 \alias{explore_chi}
-\title{This function plots the estimated extremal coefficient (chi) matrix derived from an estimated dependence matrix of the Hüsler-Reiss copula where data is on any scale. The function transforms the data to uniform margins using an empirical ranking.}
+\title{Estimate and plot matrix pairwise dependence measure}
 \usage{
 explore_chi(dat, lower_diag = T, lims = NA)
 }
