@@ -179,7 +179,7 @@ emp_chi = function(dat, u, data_scale = T, lower_diag = T){
 #'
 #' @return (ggplot2::ggplot) Plotted extremal coefficient (chi) matrix
 #' @export
-explore_emp_chi = function(dat, u = 0.5, data_scale = T, lower_diag = T, lims = NA){
+explore_emp_chi = function(dat, u = 0.8, data_scale = T, lower_diag = T, lims = NA){
   s1=s2=NULL
   plt = emp_chi(dat, u, data_scale = T) %>%
     ggplot2::ggplot()+
