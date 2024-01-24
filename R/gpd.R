@@ -12,7 +12,7 @@
 #' dgp(x = 0.5, scale = 1, shape = 0)
 dgp = function(x , scale, shape, log = F){
   # --- error control
-  if(scale < 0)
+  if(any(scale < 0))
     stop("Unsupported generalised Pareto distribution")
 
   if((shape < 0) & any(x > (-scale/shape)))
@@ -38,7 +38,7 @@ dgp = function(x , scale, shape, log = F){
 #' pgp(x = 0.5, scale = 1, shape = 0)
 pgp = function(x, scale, shape){
   # --- error control
-  if(scale < 0)
+  if(any(scale < 0))
     stop("Unsupported generalised Pareto distribution")
 
   if((shape < 0) & any(x > (-scale/shape)))
@@ -61,7 +61,7 @@ pgp = function(x, scale, shape){
 #' pgp(x = 0.5, scale = 1, shape = 0)
 qgp = function(x, scale, shape){
   # --- error control
-  if(scale < 0)
+  if(any(scale < 0))
     stop("Unsupported generalised Pareto distribution")
 
   if((shape < 0) & any(x > (-scale/shape)))
